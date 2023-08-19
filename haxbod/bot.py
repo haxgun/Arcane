@@ -19,7 +19,7 @@ class Haxbod(commands.Bot):
         super().__init__(
             token=config.ACCESS_TOKEN,
             prefix=config.PREFIX,
-            initial_channels=config.CHANNELS
+            initial_channels=db.Channel.get_all_channel_names()
         )
 
     def setup(self) -> None:
