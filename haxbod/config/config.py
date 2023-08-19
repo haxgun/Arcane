@@ -14,4 +14,4 @@ CLIENT_ID = os.environ['CLIENT_ID']
 
 DB_NAME = os.environ['DB_NAME']
 
-PREFIX = '!'
+PREFIX = os.environ['PREFIX']
