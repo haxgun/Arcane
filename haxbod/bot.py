@@ -54,6 +54,6 @@ class Haxbod(commands.Bot):
             return
 
         channel_name = f'[magenta][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/magenta][/link]'
-        message_author = f'[white]{message.author.name}[/white]'
-        console.print(f'[bold]{channel_name} {message_author}:[/] {message.content}')
+        message_author = f'[link=https://twitch.tv/{message.author.name}]{message.author.name}'
+        console.print(f'[bold]{channel_name} [{message.author.color}]{message_author}[/]: [white]{message.content}')
         await self.handle_commands(message)
