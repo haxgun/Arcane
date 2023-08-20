@@ -27,7 +27,6 @@ git clone https://github.com/starlitskies7/haxbod.git
 cd haxbod
 
 # Install the necessary packages
-
 # If you use pipenv
 pipenv install
 
@@ -47,14 +46,25 @@ python -m pip install -r requirements.txt
 nano .env.example
 cp .env.example .env
 
-# Launch the bot
+# Add channel in DB
+# If you use pipenv
+pipenv run addchannel
+# If you use venv
+python main.py addchannel
 
+# Launch the bot
 # If you use pipenv
 pipenv run bot
-
 # If you use venv
 python main.py
 ```
+
+> **Note**
+> If you want remove channel in DB
+> ```bash
+> pipenv run removechannel # If you use pipenv
+> python main.py removechannel # or if you use venv
+> ```
 
 ## 📁 Structure
 
