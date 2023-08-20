@@ -1,28 +1,23 @@
-from colorama import Fore, Style
+from rich.console import Console
 
-SB = Style.BRIGHT
-RS = Style.RESET_ALL
-W = Fore.WHITE
-G = Fore.GREEN
-R = Fore.RED
-Y = Fore.YELLOW
+console = Console()
 
 
 def print_success(message):
-    print(f'{SB}{G}[+] {W}{message}{RS}')
+    console.print(f'[bold green][+] [white]{message}[/]')
 
 
 def print_error(message):
-    print(f'{SB}{R}[!] {W}{message}{RS}')
+    console.print(f'[bold red][!] [white]{message}[/]')
 
 
 def print_loading(message):
-    print(f'{SB}{Y}[/] {W}{message}{RS}')
+    console.print(f'[bold yellow][\] [white]{message}[/]')
 
 
 def print_info(message):
-    print(f'{SB}{G}[?] {W}{message}{RS}')
+    console.print(f'[bold green][?] [white]{message}[/]')
 
 
 def input_answer(message):
-    return input(f'{SB}{G}[?] {W}{message} {RS}')
+    return input(f'[bold green][?] [white]{message} [/]')

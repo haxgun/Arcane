@@ -5,11 +5,11 @@ from twitchio.ext import commands
 
 from haxbod import settings
 from haxbod.models import db
-from haxbod.utils.print import print_success, print_error, print_loading
+from haxbod.utils.print import print_success, print_error
 
-from colorama import init, Fore, Style
+from rich.console import Console
 
-init(autoreset=True)
+console = Console()
 
 
 class Haxbod(commands.Bot):
@@ -25,17 +25,16 @@ class Haxbod(commands.Bot):
 
     def setup(self) -> None:
         if self.extensions:
-            print_loading('Installation of cogs begins...')
-            for ext in self.extensions:
-                try:
-                    self.load_module(f'haxbod.cogs.{ext}')
-                    print_success(f'"{ext}" cog loaded.')
-                except Exception:
-                    print_error(f'"{ext}" cog doesn\'t load.')
+            with console.status("[bold green]Installation of cogs begins...") as status:
+                for ext in self.extensions:
+                    try:
+                        self.load_module(f'haxbod.cogs.{ext}')
+                        print_success(f'"{ext.capitalize()}" cog loaded.')
+                    except Exception:
+                        print_error(f'"{ext.capitalize()}" cog doesn\'t load.')
 
     def run(self) -> None:
         self.setup()
-        print_loading('Bot running...')
         super().run()
 
     async def close(self) -> None:
@@ -46,17 +45,20 @@ class Haxbod(commands.Bot):
         if self.ready:
             return
 
-        print_success(f'Connected as @{self.nick} with ID: {self.user_id}')
         self.ready = True
+
+        bot_nick = f'[link=https://twitch.tv/{self.nick}][yellow]@{self.nick}[/link][/yellow]'
+        bot_id = f'[yellow]ID: {self.user_id}[/yellow]'
+
+        print_success(f'Connected as {bot_nick} with {bot_id}')
         print_success('Have a nice day!\n')
 
     async def event_message(self, message: Message):
         if message.echo:
             return
 
-        channel_name = f'{Fore.MAGENTA}[@{message.channel.name}]'
-        message_author = f'{Fore.WHITE}{message.author.name}'
-        message_content = f'{Style.RESET_ALL}{message.content}'
+        channel_name = f'[magenta][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/magenta][/link]'
+        message_author = f'[white]{message.author.name}[/white]'
 
-        print(f'{Style.BRIGHT}{channel_name} {message_author}: {message_content}')
+        console.print(f'[bold]{channel_name} {message_author}:[/] {message.content}')
         await self.handle_commands(message)
