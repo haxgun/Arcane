@@ -9,13 +9,12 @@ from haxbod.utils.decorators import owner_only
 
 
 class Owner(commands.Cog):
-
-    def __init__(self, bot: Haxbod):
+    def __init__(self, bot: Haxbod) -> None:
         self.bot = bot
 
     @commands.command(name='addchannel', aliases=['addchl'])
     @owner_only()
-    async def cmd_add_channel(self, ctx: commands.Context, *args):
+    async def cmd_add_channel(self, ctx: commands.Context, *args) -> None:
         if len(args) >= 1:
             channel_name = args[0]
             try:
@@ -35,7 +34,7 @@ class Owner(commands.Cog):
 
     @commands.command(name='delchannel', aliases=['delchl'])
     @owner_only()
-    async def cmd_del_channel(self, ctx: commands.Context, *args):
+    async def cmd_del_channel(self, ctx: commands.Context, *args) -> None:
         channel_name = args[0]
 
         with db_session:
@@ -49,5 +48,5 @@ class Owner(commands.Cog):
                 await ctx.reply(f'The user @{channel_name} is not in the database.')
 
 
-def prepare(bot: Haxbod):
+def prepare(bot: Haxbod) -> None:
     bot.add_cog(Owner(bot))

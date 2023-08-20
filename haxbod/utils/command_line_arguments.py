@@ -7,7 +7,7 @@ from haxbod.utils.print import print_success, print_error, input_answer
 bot = Haxbod()
 
 
-def add_channel():
+def add_channel() -> None:
     channel_name = str(input_answer('Which channel do you want to add?'))
 
     if not existing_channel_twitch(channel_name):
@@ -24,11 +24,11 @@ def add_channel():
             print_error(f'User @{channel_name} already exists.')
 
 
-def run_bot():
+def run_bot() -> None:
     bot.run()
 
 
-def remove_channel():
+def remove_channel() -> None:
     channel_name = str(input_answer('Which channel do you want to add?'))
 
     with db_session:

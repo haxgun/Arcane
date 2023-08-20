@@ -1,3 +1,5 @@
+from typing import List
+
 from pony.orm import Database
 from pony.orm.core import PrimaryKey, Required, db_session, Set
 
@@ -8,12 +10,11 @@ db.bind(provider='sqlite', filename=f'{settings.BASE_DIR}/{settings.DB_NAME}', c
 
 
 class Channel(db.Entity):
-    id = PrimaryKey(int, auto=True)
     name = Required(str, unique=True)
     commands = Set('Command', cascade_delete=False)
 
     @staticmethod
-    def get_all_channel_names():
+    def get_all_channel_names() -> List:
         with db_session:
             return [channel.name for channel in Channel.select()]
 
