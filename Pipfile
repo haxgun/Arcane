@@ -8,6 +8,7 @@ twitchio = "*"
 python-dotenv = "*"
 colorama = "*"
 pony = "*"
+requests = "*"
 
 [dev-packages]
 
@@ -15,4 +16,6 @@ pony = "*"
 python_version = "3.11"
 
 [scripts]
-bot = "python main.py"
+bot = "python main.py runbot"
+addchannel = "python main.py addchannel"
+removechannel = "python main.py removechannel"
