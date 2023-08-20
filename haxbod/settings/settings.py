@@ -12,6 +12,7 @@ ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
 REFRESH_TOKEN = os.environ['REFRESH_TOKEN']
 CLIENT_ID = os.environ['CLIENT_ID']
 
-DB_NAME = os.environ['DB_NAME']
-
 PREFIX = os.environ['PREFIX']
+OWNER_ID = os.environ['OWNER_ID']
+
+DB_NAME = os.environ['DB_NAME']

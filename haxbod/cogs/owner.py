@@ -5,6 +5,7 @@ from twitchio.ext import commands
 
 from haxbod.bot import Haxbod
 from haxbod.models import db
+from haxbod.utils.decorators import owner_only
 
 
 class Owner(commands.Cog):
@@ -13,7 +14,9 @@ class Owner(commands.Cog):
         self.bot = bot
 
     @commands.command(name='addchannel', aliases=['addchl'])
+    @owner_only()
     async def cmd_add_channel(self, ctx: commands.Context, *args):
+        # checks.is_owner(ctx)
         if len(args) >= 1:
             channel_name = args[0]
             try:
@@ -32,6 +35,7 @@ class Owner(commands.Cog):
                 await ctx.reply(f'The user @{channel_name} already exists.')
 
     @commands.command(name='delchannel', aliases=['delchl'])
+    @owner_only()
     async def cmd_del_channel(self, ctx: commands.Context, *args):
         channel_name = args[0]
 
