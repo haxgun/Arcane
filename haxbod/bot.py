@@ -46,7 +46,9 @@ class Haxbod(commands.Bot):
         self.ready = True
         bot_nick = f'[link=https://twitch.tv/{self.nick}][yellow]@{self.nick}[/link][/yellow]'
         bot_id = f'[yellow]ID: {self.user_id}[/yellow]'
+        channel_connected = ', '.join([f'[link=https://twitch.tv/{self.nick}][yellow]@{channel.name}[/link][/yellow]' for channel in self.connected_channels])
         print_success(f'Connected as {bot_nick} with {bot_id}')
+        print_success(f'Connected to {channel_connected}')
         print_success('Have a nice day!\n')
 
     async def event_message(self, message: Message) -> None:
