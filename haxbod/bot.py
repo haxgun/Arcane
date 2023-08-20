@@ -5,6 +5,7 @@ from twitchio.ext import commands
 
 from haxbod import settings
 from haxbod.models import db
+from haxbod.utils.print import print_success, print_error, print_loading
 
 from colorama import init, Fore, Style
 
@@ -24,35 +25,38 @@ class Haxbod(commands.Bot):
 
     def setup(self) -> None:
         if self.extensions:
-            print('⏳ Installation of cogs begins...')
+            print_loading('Installation of cogs begins...')
             for ext in self.extensions:
-                self.load_module(f'haxbod.cogs.{ext}')
-                print(f'🔩 "{ext}" cog loaded.')
+                try:
+                    self.load_module(f'haxbod.cogs.{ext}')
+                    print_success(f'"{ext}" cog loaded.')
+                except Exception:
+                    print_error(f'"{ext}" cog doesn\'t load.')
 
     def run(self) -> None:
         self.setup()
-        print('⌛ Bot running...')
+        print_loading('Bot running...')
         super().run()
 
     async def close(self) -> None:
-        print('❌ Shutdown...')
+        print_error('Shutdown...')
         await super().close()
 
     async def event_ready(self):
         if self.ready:
             return
 
-        print(f'✔ Connected as {self.nick} with ID: {self.user_id}')
+        print_success(f'Connected as @{self.nick} with ID: {self.user_id}')
         self.ready = True
-        print('🤖 Have a nice day!\n')
+        print_success('Have a nice day!\n')
 
     async def event_message(self, message: Message):
         if message.echo:
             return
 
-        channel_name = f'{Fore.GREEN}@{message.channel.name}'
-        message_author = f'{Fore.BLUE}{message.author.name}'
+        channel_name = f'{Fore.MAGENTA}[@{message.channel.name}]'
+        message_author = f'{Fore.WHITE}{message.author.name}'
         message_content = f'{Style.RESET_ALL}{message.content}'
 
-        print(f'👤 {channel_name} {message_author}: {message_content}')
+        print(f'{Style.BRIGHT}{channel_name} {message_author}: {message_content}')
         await self.handle_commands(message)
