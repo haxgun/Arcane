@@ -1,4 +1,5 @@
 from rich.console import Console
+from rich.prompt import Prompt
 
 console = Console()
 
@@ -20,4 +21,4 @@ def print_info(message):
 
 
 def input_answer(message):
-    return input(f'[bold green][?] [white]{message} [/]')
+    return Prompt.ask(f'[bold green][?] [white]{message}[/]')
