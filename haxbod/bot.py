@@ -3,7 +3,7 @@ from pathlib import Path
 from twitchio import Message
 from twitchio.ext import commands
 
-from haxbod import config
+from haxbod import settings
 from haxbod.models import db
 
 from colorama import init, Fore, Style
@@ -14,11 +14,11 @@ init(autoreset=True)
 class Haxbod(commands.Bot):
     def __init__(self):
         self.ready = False
-        self.extensions = [p.stem for p in Path(f'{config.BASE_DIR}/haxbod/cogs/').glob('*.py')]
+        self.extensions = [p.stem for p in Path(f'{settings.BASE_DIR}/haxbod/cogs/').glob('*.py')]
 
         super().__init__(
-            token=config.ACCESS_TOKEN,
-            prefix=config.PREFIX,
+            token=settings.ACCESS_TOKEN,
+            prefix=settings.PREFIX,
             initial_channels=db.Channel.get_all_channel_names()
         )
 

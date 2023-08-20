@@ -1,9 +1,9 @@
 from pony.orm.core import PrimaryKey, Required, db_session, Set
 from pony.orm import Database
-from haxbod import config
+from haxbod import settings
 
 db = Database()
-db.bind(provider='sqlite', filename=f'{config.BASE_DIR}/{config.DB_NAME}', create_db=True)
+db.bind(provider='sqlite', filename=f'{settings.BASE_DIR}/{settings.DB_NAME}', create_db=True)
 
 
 class Channel(db.Entity):

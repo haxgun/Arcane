@@ -68,8 +68,8 @@ haxbod/
 ├── haxbod                  # Main folder where the bot and its settings are contained
 │   ├── cogs                # Cogs folder
 │   │   ├── owner.py        # Owner cog with commands available only for owner bot
-│   ├── config        
-│   │   ├── config.py       # Config
+│   ├── settings        
+│   │   ├── settings.py       # Config
 │   │   ├── __init__.py
 │   ├── models              # Modules for Database
 │   │   ├── models.py       # Model Definitions
