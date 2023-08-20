@@ -16,7 +16,6 @@ class Owner(commands.Cog):
     @commands.command(name='addchannel', aliases=['addchl'])
     @owner_only()
     async def cmd_add_channel(self, ctx: commands.Context, *args):
-        # checks.is_owner(ctx)
         if len(args) >= 1:
             channel_name = args[0]
             try:
