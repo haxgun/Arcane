@@ -29,6 +29,7 @@ class Haxbod(commands.Bot):
                         print_success(f'"{ext.capitalize()}" cog loaded.')
                     except Exception:
                         print_error(f'"{ext.capitalize()}" cog doesn\'t load.')
+                        console.print_exception()
 
     def run(self) -> None:
         self.setup()
