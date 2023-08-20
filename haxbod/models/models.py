@@ -1,5 +1,6 @@
-from pony.orm.core import PrimaryKey, Required, db_session, Set
 from pony.orm import Database
+from pony.orm.core import PrimaryKey, Required, db_session, Set
+
 from haxbod import settings
 
 db = Database()

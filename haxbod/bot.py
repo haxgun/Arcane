@@ -1,19 +1,16 @@
 from pathlib import Path
-
 from twitchio import Message
 from twitchio.ext import commands
-
 from haxbod import settings
 from haxbod.models import db
 from haxbod.utils.print import print_success, print_error
-
 from rich.console import Console
 
 console = Console()
 
 
 class Haxbod(commands.Bot):
-    def __init__(self):
+    def __init__(self) -> None:
         self.ready = False
         self.extensions = [p.stem for p in Path(f'{settings.BASE_DIR}/haxbod/cogs/').glob('*.py')]
 
@@ -41,24 +38,21 @@ class Haxbod(commands.Bot):
         print_error('Shutdown...')
         await super().close()
 
-    async def event_ready(self):
+    async def event_ready(self) -> None:
         if self.ready:
             return
 
         self.ready = True
-
         bot_nick = f'[link=https://twitch.tv/{self.nick}][yellow]@{self.nick}[/link][/yellow]'
         bot_id = f'[yellow]ID: {self.user_id}[/yellow]'
-
         print_success(f'Connected as {bot_nick} with {bot_id}')
         print_success('Have a nice day!\n')
 
-    async def event_message(self, message: Message):
+    async def event_message(self, message: Message) -> None:
         if message.echo:
             return
 
         channel_name = f'[magenta][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/magenta][/link]'
         message_author = f'[white]{message.author.name}[/white]'
-
         console.print(f'[bold]{channel_name} {message_author}:[/] {message.content}')
         await self.handle_commands(message)

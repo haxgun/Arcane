@@ -1,5 +1,4 @@
 from pony.orm import db_session
-
 from haxbod.bot import Haxbod
 from haxbod.models import db
 from haxbod.utils.twitchapi import existing_channel_twitch
