@@ -62,8 +62,10 @@ python main.py
 > **Note**
 > If you want remove channel in DB
 > ```bash
-> pipenv run removechannel # If you use pipenv
-> python main.py removechannel # or if you use venv
+> # If you use pipenv
+> pipenv run removechannel 
+> # or if you use venv
+> python main.py removechannel
 > ```
 
 ## 📁 Structure
