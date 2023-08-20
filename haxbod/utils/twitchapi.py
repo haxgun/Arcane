@@ -2,7 +2,7 @@ import requests
 from haxbod import settings
 
 
-def channel_exists(channel_name):
+def existing_channel_twitch(channel_name):
     client_id = settings.CLIENT_ID
     access_token = settings.ACCESS_TOKEN
 

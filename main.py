@@ -6,41 +6,27 @@ from pony.orm import db_session
 
 from haxbod.bot import Haxbod
 from haxbod.models import db
-
-from colorama import Fore, Style
-
-from haxbod.utils.twitchapi import channel_exists
+from haxbod.utils.twitchapi import existing_channel_twitch
+from haxbod.utils.print import print_success, print_error, input_answer
 
 bot = Haxbod()
 
-SB = Style.BRIGHT
-RS = Style.RESET_ALL
-W = Fore.WHITE
-G = Fore.GREEN
-R = Fore.RED
-Y = Fore.YELLOW
-
 
 def add_channel():
-    channel_name = str(input(f'{SB}{G}[?] {W}Which channel do you want to add? {RS}'))
+    channel_name = str(input_answer('Which channel do you want to add?'))
 
-    if len(channel_name.split()) == 1:
-        try:
-            channel_exists(channel_name)
-        except Exception as e:
-            print('There is no such user!')
-            return
+    if not existing_channel_twitch(channel_name):
+        print_error('There is no such user!')
+        return
 
-        with db_session:
-            existing_channel = db.Channel.get(name=channel_name)
+    with db_session:
+        existing_channel_db = db.Channel.get(name=channel_name)
 
-            if existing_channel:
-                print(f'{SB}{R}[!] {W}User {G}@{channel_name}{W} already exists.')
-            else:
-                channel = db.Channel(name=channel_name)
-                print(f'{SB}{Y}[+] {W}User {G}@{channel_name}{W} added.')
-    else:
-        raise ValueError(f'{SB}{Y}[!] {W}Enter the correct channel value.')
+        if not existing_channel_db:
+            channel = db.Channel(name=channel_name)
+            print_success(f'User @{channel_name} added.')
+        else:
+            print_error(f'User @{channel_name} already exists.')
 
 
 def run_bot():
@@ -48,19 +34,16 @@ def run_bot():
 
 
 def remove_channel():
-    channel_name = str(input(f'{SB}{G}[?] {W}Which channel do you want to remove? {RS}'))
+    channel_name = str(input_answer('Which channel do you want to add?'))
 
-    if len(channel_name.split()) == 1:
-        with db_session:
-            existing_channel = db.Channel.get(name=channel_name)
+    with db_session:
+        existing_channel = db.Channel.get(name=channel_name)
 
-            if existing_channel:
-                existing_channel.delete()
-                print(f'{SB}{Y}[-] {W}User {G}@{channel_name}{W} has been removed from the database.')
-            else:
-                print(f'{SB}{R}[!] {W}User {G}@{channel_name}{W} is not in the database.')
-    else:
-        raise ValueError(f'{SB}{R}[!] {W}Enter the correct channel value.')
+        if existing_channel:
+            existing_channel.delete()
+            print_success(f'User @{channel_name} has been removed from the database.')
+        else:
+            print_error(f'User @{channel_name} is not in the database.')
 
 
 def main():
