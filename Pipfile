@@ -6,9 +6,9 @@ name = "pypi"
 [packages]
 twitchio = "*"
 python-dotenv = "*"
-colorama = "*"
 pony = "*"
 requests = "*"
+rich = "*"
 
 [dev-packages]
 
