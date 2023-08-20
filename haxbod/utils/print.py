@@ -9,11 +9,15 @@ Y = Fore.YELLOW
 
 
 def print_success(message):
-    print(f'{SB}{Y}[+] {W}{message}{RS}')
+    print(f'{SB}{G}[+] {W}{message}{RS}')
 
 
 def print_error(message):
     print(f'{SB}{R}[!] {W}{message}{RS}')
+
+
+def print_loading(message):
+    print(f'{SB}{Y}[/] {W}{message}{RS}')
 
 
 def print_info(message):
