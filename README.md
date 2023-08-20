@@ -20,78 +20,26 @@
 - Pipenv or venv
 - VSCode or Pycharm
 
-> NOTE: I recommend using pipenv instead of venv
-
-```bash
-git clone https://github.com/starlitskies7/haxbod.git
-cd haxbod
-
-# Install the necessary packages
-# If you use pipenv
-pipenv install
-
-# If you use venv
-python -m venv .venv
-# If you use Linux/MacOS
-source .venv/bin/activate
-# or if you use Windows
-./venv/Scripts/activate
-# For install packages
-python -m pip install -r requirements.txt
-
-# Go to https://twitchtokengenerator.com/
-# Generate initial token WITH ALL SCOPES 
-
-# Configure .env and rename
-nano .env.example
-cp .env.example .env
-
-# Add channel in DB
-# If you use pipenv
-pipenv run addchannel
-# If you use venv
-python main.py addchannel
-
-# Launch the bot
-# If you use pipenv
-pipenv run bot
-# If you use venv
-python main.py
-```
+To set up the Haxbod, follow these steps:
+1. Install [pipenv](https://pipenv.pypa.io/en/latest/).
+2. Clone the repository
+3. Install the necessary packages with `pipenv install`
+4. Go to [TwitchTokenGenerator](https://twitchtokengenerator.com/) and generate initial token WITH ALL SCOPES.
+5. Copy the example environment file: `cp .env.example .env` and update the variables with your prefix, database and Twitch credentials.
+6. Add the channel to the database: `pipenv run addchannel`
+7. Start using the bot: `pipenv run bot`
 
 > **Note**
-> If you want remove channel in DB
-> ```bash
-> # If you use pipenv
-> pipenv run removechannel 
-> # or if you use venv
-> python main.py removechannel
-> ```
+> If you want remove channel from database
+> `pipenv run removechannel `
 
-## 📁 Structure
+## 🗃️ Structure
+* `/haxbod`: main folder of the bot
+    * `/cogs`: cogs folder
+    * `/settings`: configuration settings of the bot
+    * `/models`: modules for Database
+    * `bot.py`: bot core
+* `main.py`: main file for launch bot
 
-```bash
-haxbod/
-├── main.py                 # Main file for launch bot
-├── docs                    # Files for docs
-│   ├── media
-│   │   ├── logo_dark.png   # Dark logo
-│   │   ├── logo_light.png  # Light logo
-├── haxbod                  # Main folder where the bot and its settings are contained
-│   ├── cogs                # Cogs folder
-│   │   ├── owner.py        # Owner cog with commands available only for owner bot
-│   ├── settings        
-│   │   ├── settings.py       # Config
-│   │   ├── __init__.py
-│   ├── models              # Modules for Database
-│   │   ├── models.py       # Model Definitions
-│   │   ├── __init__.py
-│   ├── bot.py              # Main file for the bot to work
-│   ├── __init__.py 
-├── .env.example            # File for env settings
-├── .gitignore              # .gitignore
-├── LICENSE                 # License
-├── README.md               # Readme
-├── Pipfile                 # File with dependencies
-└── requirements.txt        # File with dependencies
-```
+## 📄 License
+[Haxbot](https://github.com/starlitskies7/haxbod) is completely free and has an [the MIT license](https://github.com/starlitskies7/haxbod/blob/main/LICENSE). If you want, you can put a star on Github.
