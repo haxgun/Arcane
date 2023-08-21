@@ -1,9 +1,11 @@
 from pathlib import Path
+
 from twitchio import Message
 from twitchio.ext import commands
 from haxbod import settings
 from haxbod.models import db
 from haxbod.utils.print import print_success, print_error
+from haxbod.utils.custom_commands import find_custom_command, custom_command_response
 from rich.console import Console
 
 console = Console()
@@ -58,4 +60,24 @@ class Haxbod(commands.Bot):
         channel_name = f'[magenta][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/magenta][/link]'
         message_author = f'[link=https://twitch.tv/{message.author.name}]{message.author.name}'
         console.print(f'[bold]{channel_name} [{message.author.color}]{message_author}[/]: [white]{message.content}')
+
         await self.handle_commands(message)
+
+    async def event_command_error(self, context: commands.Context, error: Exception) -> None:
+        pass
+
+    async def handle_commands(self, message):
+        context = await self.get_context(message)
+        await self.invoke_custom(context)
+
+    async def invoke_custom(self, context):
+        if await find_custom_command(context):
+            response = await custom_command_response(context)
+            await context.reply(response)
+            return
+
+        if not context.prefix or not context.is_valid:
+            return
+
+        self.run_event("command_invoke", context)
+        await context.command(context)
