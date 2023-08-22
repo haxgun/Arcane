@@ -27,6 +27,10 @@ class Moderator(commands.Cog):
             command_name = args[0]
             response = ' '.join(args[1:])
 
+            if starts_with_emoji(command_name):
+                await ctx.reply(f'Command must not contain an emoji!')
+                return
+
             channel = db.Channel.get(name=ctx.channel.name)
             command = db.Command.get(name=command_name, channel=channel.id)
 
@@ -51,10 +55,6 @@ class Moderator(commands.Cog):
         if len(args) >= 2:
             command_name = args[0]
             new_response = ' '.join(args[1:])
-
-            if starts_with_emoji(command_name):
-                await ctx.reply(f'Command must not contain an emoji!')
-                return
 
             channel = db.Channel.get(name=ctx.channel.name)
             command = db.Command.get(name=command_name, channel=channel.id)
