@@ -10,6 +10,10 @@ class Moderator(commands.Cog):
     def __init__(self, bot: Haxbod) -> None:
         self.bot = bot
 
+    @staticmethod
+    async def send_usage(ctx, command):
+        await ctx.reply(f'Usage: {command} <command> <response>')
+
     @commands.command(name='addcommand', aliases=['addcmd'])
     @permission('moderator', 'broadcaster')
     @db_session
@@ -33,7 +37,7 @@ class Moderator(commands.Cog):
             await ctx.reply(f'Command !{command_name} has been added.')
         else:
             main_command = ctx.message.content.split()[0]
-            await ctx.reply(f'Usage: {main_command} <command> <response>')
+            await self.send_usage(ctx, main_command)
 
     @commands.command(name='editcommand', aliases=['editcmd'])
     @permission('moderator', 'broadcaster')
@@ -54,7 +58,7 @@ class Moderator(commands.Cog):
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
             main_command = ctx.message.content.split()[0]
-            await ctx.reply(f'Usage: {main_command} <command> <response>')
+            await self.send_usage(ctx, main_command)
 
     @commands.command(name='delcommand', aliases=['delcmd'])
     @permission('moderator', 'broadcaster')
@@ -73,7 +77,7 @@ class Moderator(commands.Cog):
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
             main_command = ctx.message.content.split()[0]
-            await ctx.reply(f'Usage: {main_command} <command> <response>')
+            await self.send_usage(ctx, main_command)
 
 
 def prepare(bot: Haxbod) -> None:
