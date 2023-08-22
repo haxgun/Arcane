@@ -7,6 +7,8 @@ from haxbod.utils.decorators import permission
 
 
 class Moderator(commands.Cog):
+    __slots__ = 'bot'
+
     def __init__(self, bot: Haxbod) -> None:
         self.bot = bot
 

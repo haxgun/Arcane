@@ -9,6 +9,8 @@ from haxbod.utils.decorators import owner_only
 
 
 class Owner(commands.Cog):
+    __slots__ = 'bot'
+
     def __init__(self, bot: Haxbod) -> None:
         self.bot = bot
 

@@ -12,6 +12,8 @@ console = Console()
 
 
 class Haxbod(commands.Bot):
+    __slots__ = ('ready', 'extensions')
+
     def __init__(self) -> None:
         self.ready = False
         self.extensions = [p.stem for p in Path(f'{settings.BASE_DIR}/haxbod/cogs/').glob('*.py')]
