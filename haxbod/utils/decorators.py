@@ -14,7 +14,7 @@ def owner_only() -> Callable[..., None]:
     return decorator
 
 
-def check_user_roles(ctx: commands.Context) -> List:
+def check_user_roles(ctx: commands.Context) -> List[str]:
     user_roles = []
     if ctx.author.is_broadcaster: user_roles.append('broadcaster')
     if ctx.author.is_mod: user_roles.append('moderator')

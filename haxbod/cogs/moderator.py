@@ -1,3 +1,5 @@
+from typing import Any
+
 from pony.orm import db_session
 from twitchio.ext import commands
 
@@ -13,13 +15,13 @@ class Moderator(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def send_usage(ctx, command):
+    async def send_usage(ctx: commands.Context, command: str) -> None:
         await ctx.reply(f'Usage: {command} <command> <response>')
 
     @commands.command(name='addcommand', aliases=['addcmd'])
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_add_command(self, ctx: commands.Context, *args) -> None:
+    async def cmd_add_command(self, ctx: commands.Context, *args: Any) -> None:
         if len(args) >= 2:
             command_name = args[0]
             response = ' '.join(args[1:])
@@ -44,7 +46,7 @@ class Moderator(commands.Cog):
     @commands.command(name='editcommand', aliases=['editcmd'])
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_edit_command(self, ctx: commands.Context, *args) -> None:
+    async def cmd_edit_command(self, ctx: commands.Context, *args: Any) -> None:
         if len(args) >= 2:
             command_name = args[0]
             new_response = ' '.join(args[1:])
@@ -65,7 +67,7 @@ class Moderator(commands.Cog):
     @commands.command(name='delcommand', aliases=['delcmd'])
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_delete_command(self, ctx: commands.Context, *args) -> None:
+    async def cmd_delete_command(self, ctx: commands.Context, *args: Any) -> None:
         if len(args) >= 1:
             command_name = args[0]
 

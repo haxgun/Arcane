@@ -14,9 +14,9 @@ class Channel(db.Entity):
     commands = Set('Command', cascade_delete=False)
 
     @staticmethod
-    def get_all_channel_names() -> List:
-        with db_session:
-            return [channel.name for channel in Channel.select()]
+    @db_session
+    def get_all_channel_names() -> List[str]:
+        return [channel.name for channel in Channel.select()]
 
 
 class Command(db.Entity):

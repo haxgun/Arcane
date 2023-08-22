@@ -68,11 +68,11 @@ class Haxbod(commands.Bot):
     async def event_command_error(self, context: commands.Context, error: Exception) -> None:
         pass
 
-    async def handle_commands(self, message):
+    async def handle_commands(self, message: Message) -> None:
         context = await self.get_context(message)
         await self.invoke_custom(context)
 
-    async def invoke_custom(self, context):
+    async def invoke_custom(self, context: commands.Context) -> None:
         if await find_custom_command(context):
             response = await custom_command_response(context)
             await context.reply(response)

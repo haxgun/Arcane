@@ -1,4 +1,5 @@
 from asyncio import gather
+from typing import Any
 
 from pony.orm import db_session
 from twitchio.ext import commands
@@ -16,7 +17,7 @@ class Owner(commands.Cog):
 
     @commands.command(name='addchannel', aliases=['addchl'])
     @owner_only()
-    async def cmd_add_channel(self, ctx: commands.Context, *args) -> None:
+    async def cmd_add_channel(self, ctx: commands.Context, *args: Any) -> None:
         if len(args) >= 1:
             channel_name = args[0]
             try:
@@ -36,7 +37,7 @@ class Owner(commands.Cog):
 
     @commands.command(name='delchannel', aliases=['delchl'])
     @owner_only()
-    async def cmd_del_channel(self, ctx: commands.Context, *args) -> None:
+    async def cmd_del_channel(self, ctx: commands.Context, *args: Any) -> None:
         channel_name = args[0]
 
         with db_session:
