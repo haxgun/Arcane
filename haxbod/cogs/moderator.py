@@ -5,6 +5,7 @@ from twitchio.ext import commands
 
 from haxbod.bot import Haxbod
 from haxbod.models import db
+from haxbod.utils.custom_commands import starts_with_emoji
 from haxbod.utils.decorators import permission
 
 
@@ -50,6 +51,10 @@ class Moderator(commands.Cog):
         if len(args) >= 2:
             command_name = args[0]
             new_response = ' '.join(args[1:])
+
+            if starts_with_emoji(command_name):
+                await ctx.reply(f'Command must not contain an emoji!')
+                return
 
             channel = db.Channel.get(name=ctx.channel.name)
             command = db.Command.get(name=command_name, channel=channel.id)
