@@ -17,10 +17,20 @@ class Moderator(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def send_usage(ctx: commands.Context, command: str) -> None:
-        await ctx.reply(f'Usage: {command} <command> <response>')
+    async def send_usage(ctx: commands.Context) -> None:
+        main_command = ctx.message.content.split()[0]
+        sub_command = ctx.message.content.split()[1]
+        await ctx.reply(f'Usage: {main_command} {sub_command} <command> <response>')
 
-    @group(name='command')
+    @commands.command(name='commands', aliases=['cmds'])
+    async def cmd_commands(self, ctx: commands.Context) -> None:
+        with db_session:
+            channel_id = db.Channel.get(name=ctx.channel.name).id
+            commands_list = [command.name for command in db.Command.select(channel=channel_id)]
+            commands_str = ', '.join(commands_list)
+            await ctx.reply(f'Commands: {commands_str}')
+
+    @group(name='command', aliases=['cmd'])
     @permission('moderator', 'broadcaster')
     async def cmd_command(self, ctx: commands.Context) -> None:
         await ctx.reply("Usage: !command [add|remove|edit]")
@@ -51,8 +61,7 @@ class Moderator(commands.Cog):
                 return
             await ctx.reply(f'Command !{command_name} has been added.')
         else:
-            main_command = ctx.message.content.split()[0]
-            await self.send_usage(ctx, main_command)
+            await self.send_usage(ctx)
 
     @cmd_command.command(name='remove')
     @permission('moderator', 'broadcaster')
@@ -70,8 +79,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
-            main_command = ctx.message.content.split()[0]
-            await self.send_usage(ctx, main_command)
+            await self.send_usage(ctx)
 
     @cmd_command.command(name='edit')
     @permission('moderator', 'broadcaster')
@@ -91,8 +99,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
-            main_command = ctx.message.content.split()[0]
-            await self.send_usage(ctx, main_command)
+            await self.send_usage(ctx)
 
 
 def prepare(bot: Haxbod) -> None:
