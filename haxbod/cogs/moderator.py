@@ -8,6 +8,7 @@ from haxbod.bot import Haxbod
 from haxbod.models import db
 from haxbod.utils.custom_commands import starts_with_emoji
 from haxbod.utils.decorators import permission
+from haxbod.utils.twitchapi import cmd_set_stream_title, get_stream_title
 
 
 class Moderator(commands.Cog):
@@ -100,6 +101,23 @@ class Moderator(commands.Cog):
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
             await self.send_usage(ctx)
+
+    @commands.command(name='title')
+    async def cmd_title(self, ctx: commands.Context, *, new_title: str = None) -> None:
+        channel_name = ctx.channel.name
+        if new_title is not None and (ctx.author.is_mod or ctx.author.is_broadcaster):
+            if new_title == await get_stream_title(channel_name=channel_name):
+                await ctx.reply('Error! This title is already in use!')
+                return
+            new_title_result = await cmd_set_stream_title(channel_name=channel_name, title=new_title)
+            if new_title_result:
+                await ctx.reply('Title has been changed!')
+                return
+            await ctx.reply('Title has not been changed!')
+            return
+        channel_info = await self.bot.fetch_channel(broadcaster=channel_name)
+        channel_title = channel_info.title
+        await ctx.reply(channel_title)
 
 
 def prepare(bot: Haxbod) -> None:
