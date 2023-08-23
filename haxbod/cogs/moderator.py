@@ -2,6 +2,7 @@ from typing import Any
 
 from pony.orm import db_session
 from twitchio.ext import commands
+from twitchio.ext.commands.core import group
 
 from haxbod.bot import Haxbod
 from haxbod.models import db
@@ -19,7 +20,12 @@ class Moderator(commands.Cog):
     async def send_usage(ctx: commands.Context, command: str) -> None:
         await ctx.reply(f'Usage: {command} <command> <response>')
 
-    @commands.command(name='addcommand', aliases=['addcmd'])
+    @group(name='command')
+    @permission('moderator', 'broadcaster')
+    async def cmd_command(self, ctx: commands.Context) -> None:
+        await ctx.reply("Usage: !command [add|remove|edit]")
+
+    @cmd_command.command(name='add')
     @permission('moderator', 'broadcaster')
     @db_session
     async def cmd_add_command(self, ctx: commands.Context, *args: Any) -> None:
@@ -48,7 +54,26 @@ class Moderator(commands.Cog):
             main_command = ctx.message.content.split()[0]
             await self.send_usage(ctx, main_command)
 
-    @commands.command(name='editcommand', aliases=['editcmd'])
+    @cmd_command.command(name='remove')
+    @permission('moderator', 'broadcaster')
+    @db_session
+    async def cmd_delete_command(self, ctx: commands.Context, *args: Any) -> None:
+        if len(args) >= 1:
+            command_name = args[0]
+
+            channel = db.Channel.get(name=ctx.channel.name)
+            command = db.Command.get(name=command_name, channel=channel.id)
+
+            if channel and command:
+                command.delete()
+                await ctx.reply(f'Command !{command_name} has been deleted.')
+            else:
+                await ctx.reply(f'Command !{command_name} not found.')
+        else:
+            main_command = ctx.message.content.split()[0]
+            await self.send_usage(ctx, main_command)
+
+    @cmd_command.command(name='edit')
     @permission('moderator', 'broadcaster')
     @db_session
     async def cmd_edit_command(self, ctx: commands.Context, *args: Any) -> None:
@@ -63,25 +88,6 @@ class Moderator(commands.Cog):
                 command.response = new_response
                 db.commit()
                 await ctx.reply(f'Command !{command_name} has been updated.')
-            else:
-                await ctx.reply(f'Command !{command_name} not found.')
-        else:
-            main_command = ctx.message.content.split()[0]
-            await self.send_usage(ctx, main_command)
-
-    @commands.command(name='delcommand', aliases=['delcmd'])
-    @permission('moderator', 'broadcaster')
-    @db_session
-    async def cmd_delete_command(self, ctx: commands.Context, *args: Any) -> None:
-        if len(args) >= 1:
-            command_name = args[0]
-
-            channel = db.Channel.get(name=ctx.channel.name)
-            command = db.Command.get(name=command_name, channel=channel.id)
-
-            if channel and command:
-                command.delete()
-                await ctx.reply(f'Command !{command_name} has been deleted.')
             else:
                 await ctx.reply(f'Command !{command_name} not found.')
         else:
