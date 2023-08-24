@@ -1,5 +1,3 @@
-from typing import Any
-
 from pony.orm import db_session
 from twitchio.ext import commands
 from twitchio.ext.commands.core import group
@@ -39,7 +37,7 @@ class Moderator(commands.Cog):
     @cmd_command.command(name='add')
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_add_command(self, ctx: commands.Context, *args: Any) -> None:
+    async def cmd_add_command(self, ctx: commands.Context, *args: str) -> None:
         if len(args) >= 2:
             command_name = args[0]
             response = ' '.join(args[1:])
@@ -67,7 +65,7 @@ class Moderator(commands.Cog):
     @cmd_command.command(name='remove')
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_delete_command(self, ctx: commands.Context, *args: Any) -> None:
+    async def cmd_delete_command(self, ctx: commands.Context, *args: str) -> None:
         if len(args) >= 1:
             command_name = args[0]
 
@@ -85,7 +83,7 @@ class Moderator(commands.Cog):
     @cmd_command.command(name='edit')
     @permission('moderator', 'broadcaster')
     @db_session
-    async def cmd_edit_command(self, ctx: commands.Context, *args: Any) -> None:
+    async def cmd_edit_command(self, ctx: commands.Context, *args: str) -> None:
         if len(args) >= 2:
             command_name = args[0]
             new_response = ' '.join(args[1:])
@@ -103,6 +101,7 @@ class Moderator(commands.Cog):
             await self.send_usage(ctx)
 
     @commands.command(name='title')
+    @permission('moderator', 'broadcaster')
     async def cmd_title(self, ctx: commands.Context, *, new_title: str = None) -> None:
         channel_name = ctx.channel.name
         if new_title is not None and (ctx.author.is_mod or ctx.author.is_broadcaster):
@@ -118,6 +117,21 @@ class Moderator(commands.Cog):
         channel_info = await self.bot.fetch_channel(broadcaster=channel_name)
         channel_title = channel_info.title
         await ctx.reply(channel_title)
+
+    @commands.command(name='spam')
+    @permission('moderator', 'broadcaster')
+    async def cmd_spam(self, ctx: commands.Context, *args) -> None:
+        if len(args) >= 2:
+            count = int(args[0])
+            max_count = 20
+            if count < max_count:
+                response = ' '.join(args[1:])
+                for _ in range(count):
+                    await ctx.send(response)
+            else:
+                await ctx.reply(f'Error! Count must be less than {max_count}!')
+        else:
+            await ctx.reply('Usage: !spam <count> <response>')
 
 
 def prepare(bot: Haxbod) -> None:
