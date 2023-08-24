@@ -96,15 +96,48 @@ async def get_followers_count(channel_name: str) -> Optional[list]:
             return
 
 
-async def cmd_set_stream_title(channel_name, *, title: str) -> bool:
-    channel_id = await get_broadcaster_id(channel_name)
-    if channel_id is not None:
-        url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
-        payload = {
-            'title': title
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.patch(url, headers=headers, json=payload) as response:
-                if response.status == 204:
-                    return True
-    return False
+async def get_game_id(new_game: str) -> Optional[str]:
+    url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data["data"][0]["id"]
+            return
+
+
+async def get_game_name(new_game: str) -> Optional[str]:
+    url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data["data"][0]["name"]
+            return
+
+
+# These commands do not work with the bot token.
+# Therefore, they were disabled. Looking for a solution.
+
+# async def change_stream_game(channel_name: str, game_id: str) -> bool:
+#     channel_id = await get_broadcaster_id(channel_name)
+#     if channel_id:
+#         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
+#         payload = {'game_id': game_id}
+#         async with aiohttp.ClientSession() as session:
+#             async with session.patch(url, headers=headers, json=payload) as response:
+#                 if response.status == 204:
+#                     return True
+#     return False
+#
+#
+# async def set_stream_title(channel_name: str, *, title: str) -> bool:
+#     channel_id = await get_broadcaster_id(channel_name)
+#     if channel_id:
+#         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
+#         payload = {'title': title}
+#         async with aiohttp.ClientSession() as session:
+#             async with session.patch(url, headers=headers, json=payload) as response:
+#                 if response.status == 204:
+#                     return True
+#     return False
