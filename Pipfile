@@ -10,6 +10,8 @@ pony = "*"
 requests = "*"
 rich = "*"
 emoji = "*"
+python-dateutil = "*"
+pytz = "*"
 
 [dev-packages]
 
