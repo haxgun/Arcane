@@ -14,6 +14,7 @@ REFRESH_TOKEN = environ['REFRESH_TOKEN']
 CLIENT_ID = environ['CLIENT_ID']
 
 # Bot settings
+DEBUG = environ['DEBUG']
 PREFIX = environ['PREFIX']
 OWNER_ID = environ['OWNER_ID']
 

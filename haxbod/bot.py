@@ -1,3 +1,5 @@
+import sys
+import traceback
 from pathlib import Path
 
 from twitchio import Message
@@ -66,6 +68,10 @@ class Haxbod(commands.Bot):
         await self.handle_commands(message)
 
     async def event_command_error(self, context: commands.Context, error: Exception) -> None:
+        if settings.DEBUG:
+            print(f"Ignoring exception in command: {error}:", file=sys.stderr)
+            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+            return
         pass
 
     async def handle_commands(self, message: Message) -> None:
