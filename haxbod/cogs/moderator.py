@@ -21,20 +21,18 @@ class Moderator(commands.Cog):
         sub_command = ctx.message.content.split()[1]
         await ctx.reply(f'Usage: {main_command} {sub_command} <command> <response>')
 
-    @commands.command(name='commands', aliases=['cmds'])
+    @group(name='commands', aliases=['cmds'])
     async def cmd_commands(self, ctx: commands.Context) -> None:
         with db_session:
             channel_id = db.Channel.get(name=ctx.channel.name).id
             commands_list = [command.name for command in db.Command.select(channel=channel_id)]
-            commands_str = ', '.join(commands_list)
-            await ctx.reply(f'Commands: {commands_str}')
+            if commands_list:
+                commands_str = ', '.join(commands_list)
+                await ctx.reply(f'Commands: {commands_str}')
+                return
+            await ctx.reply(f'No commands.')
 
-    @group(name='command', aliases=['cmd'])
-    @permission('moderator', 'broadcaster')
-    async def cmd_command(self, ctx: commands.Context) -> None:
-        await ctx.reply("Usage: !command [add|remove|edit]")
-
-    @cmd_command.command(name='add')
+    @cmd_commands.command(name='add')
     @permission('moderator', 'broadcaster')
     @db_session
     async def cmd_add_command(self, ctx: commands.Context, *args: str) -> None:
@@ -62,7 +60,7 @@ class Moderator(commands.Cog):
         else:
             await self.send_usage(ctx)
 
-    @cmd_command.command(name='remove')
+    @cmd_commands.command(name='remove')
     @permission('moderator', 'broadcaster')
     @db_session
     async def cmd_delete_command(self, ctx: commands.Context, *args: str) -> None:
@@ -80,7 +78,7 @@ class Moderator(commands.Cog):
         else:
             await self.send_usage(ctx)
 
-    @cmd_command.command(name='edit')
+    @cmd_commands.command(name='edit')
     @permission('moderator', 'broadcaster')
     @db_session
     async def cmd_edit_command(self, ctx: commands.Context, *args: str) -> None:
