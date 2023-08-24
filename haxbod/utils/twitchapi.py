@@ -1,3 +1,9 @@
+from datetime import datetime
+
+import pytz
+from dateutil.parser import parse as parse_datetime
+from typing import Optional
+
 import aiohttp
 import requests
 from haxbod import settings
@@ -18,26 +24,75 @@ def existing_channel_twitch(channel_name: str) -> bool:
     return False
 
 
-async def get_broadcaster_id(channel_name: str) -> str | None:
+async def get_stream(channel_name: str) -> Optional[list]:
+    url = f'https://api.twitch.tv/helix/streams?user_login={channel_name}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data['data']
+            return
+
+
+async def get_user(channel_name: str) -> Optional[dict]:
     url = f'https://api.twitch.tv/helix/users?login={channel_name}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                user_id = data['data'][0]['id']
-                return user_id
+                return data
             return
 
 
-async def get_stream_title(channel_name: str) -> str | None:
+async def get_broadcaster_id(channel_name: str) -> Optional[str]:
+    data = await get_user(channel_name)
+    if data:
+        return data['data'][0]['id']
+    return
+
+
+async def get_user_creation(channel_name: str) -> Optional[datetime]:
+    data = await get_user(channel_name)
+    if data:
+        created_at_str = data['data'][0]['created_at']
+        return parse_datetime(created_at_str).replace(tzinfo=pytz.UTC)
+    return
+
+
+async def get_stream_title(channel_name: str) -> Optional[str]:
+    data = await get_stream(channel_name)
+    if data:
+        return data[0]['title']
+    return
+
+
+async def get_stream_started_at(channel_name: str) -> Optional[datetime]:
+    data = await get_stream(channel_name)
+    if data:
+        started_at_str = data[0]['started_at']
+        return parse_datetime(started_at_str).replace(tzinfo=pytz.UTC)
+    return
+
+
+async def get_followers(channel_name: str) -> Optional[list]:
     channel_id = await get_broadcaster_id(channel_name)
-    url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
+    url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                title = data['data'][0]['title']
-                return title
+                return data['data']
+            return
+
+
+async def get_followers_count(channel_name: str) -> Optional[list]:
+    channel_id = await get_broadcaster_id(channel_name)
+    url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data['total']
             return
 
 
