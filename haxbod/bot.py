@@ -5,7 +5,7 @@ from pathlib import Path
 from twitchio import Message
 from twitchio.ext import commands
 from haxbod import settings
-from haxbod.models import db
+from haxbod.models import Channel
 from haxbod.utils.print import print_success, print_error
 from haxbod.utils.custom_commands import find_custom_command, custom_command_response
 from rich.console import Console
@@ -23,7 +23,7 @@ class Haxbod(commands.Bot):
         super().__init__(
             token=settings.ACCESS_TOKEN,
             prefix=settings.PREFIX,
-            initial_channels=db.Channel.get_all_channel_names()
+            initial_channels=Channel.get_all_channel_names()
         )
 
     def setup(self) -> None:
@@ -61,9 +61,11 @@ class Haxbod(commands.Bot):
         if message.echo:
             return
 
-        channel_name = f'[magenta][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/magenta][/link]'
-        message_author = f'[link=https://twitch.tv/{message.author.name}]{message.author.name}'
-        console.print(f'[bold]{channel_name} [{message.author.color}]{message_author}[/]: [white]{message.content}')
+        if settings.DEBUG:
+            channel_name = f'[purple3][@[link=https://twitch.tv/{message.channel.name}]{message.channel.name}][/link][/purple3]'
+            message_author = f'[link=https://twitch.tv/{message.author.name}]{message.author.name}'
+            message_author_color = f'[{message.author.color}]' if message.author.color else ''
+            console.print(f'[bold]{channel_name} {message_author_color}{message_author}[/]: [white]{message.content}')
 
         await self.handle_commands(message)
 

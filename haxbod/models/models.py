@@ -1,29 +1,31 @@
 from typing import List
 
-from pony.orm import Database
-from pony.orm.core import PrimaryKey, Required, db_session, Set
-
 from haxbod import settings
 
-db = Database()
-db.bind(provider='sqlite', filename=f'{settings.BASE_DIR}/{settings.DB_NAME}', create_db=True)
+from peewee import SqliteDatabase, Model, CharField, IntegerField, ForeignKeyField, DoesNotExist
+
+db = SqliteDatabase(settings.DB_NAME)
 
 
-class Channel(db.Entity):
-    name = Required(str, unique=True)
-    commands = Set('Command', cascade_delete=False)
+class Channel(Model):
+    name = CharField(null=False, unique=True)
+
+    class Meta:
+        database = db
 
     @staticmethod
-    @db_session
     def get_all_channel_names() -> List[str]:
         return [channel.name for channel in Channel.select()]
 
 
-class Command(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    name = Required(str, unique=True)
-    response = Required(str, default="Нет ответа")
-    channel = Required(Channel)
+class Command(Model):
+    id = IntegerField(unique=True, primary_key=True, null=False)
+    name = CharField(unique=True, null=False)
+    response = CharField(default="Нет ответа")
+    channel = ForeignKeyField(Channel, backref='commands', on_delete='CASCADE')
+
+    class Meta:
+        database = db
 
 
-db.generate_mapping(create_tables=True)
+db.create_tables([Channel, Command])
