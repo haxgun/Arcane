@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Python-3.11.4-informational.svg">
   <img src="https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg">
   <a href="https://github.com/starlitskies7/haxbod/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/starlitskies7/haxbod">
+    <img src="https://img.shields.io/github/license/haxgun/haxbod">
   </a>
 </p>
 
@@ -42,4 +42,4 @@ To set up the Haxbod, follow these steps:
 * `main.py`: main file for launch bot
 
 ## 📄 License
-[Haxbot](https://github.com/starlitskies7/haxbod) is completely free and has an [the MIT license](https://github.com/starlitskies7/haxbod/blob/main/LICENSE). If you want, you can put a star on Github.
+[Haxbot](https://github.com/haxgun/haxbod) is completely free and has an [the MIT license](https://github.com/haxgun/haxbod/blob/main/LICENSE). If you want, you can put a star on Github.
