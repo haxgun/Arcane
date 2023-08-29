@@ -1,11 +1,11 @@
 from asyncio import gather
 from typing import Any
 
-from pony.orm import db_session
+from peewee import IntegrityError, DoesNotExist
 from twitchio.ext import commands
 
 from haxbod.bot import Haxbod
-from haxbod.models import db
+from haxbod.models import Channel
 from haxbod.utils.decorators import owner_only
 
 
@@ -25,30 +25,25 @@ class Owner(commands.Cog):
             except Exception:
                 await ctx.reply('There is no such user!')
                 return
-
-            with db_session:
-                channel = db.Channel(name=channel_name)
-
-            if channel:
+            try:
+                channel = Channel.create(name=channel_name)
                 await self.bot.join_channels([channel_name])
                 await ctx.reply(f'The user @{channel_name} added.')
-            else:
+            except IntegrityError:
                 await ctx.reply(f'The user @{channel_name} already exists.')
 
     @commands.command(name='delchannel', aliases=['delchl'])
     @owner_only()
     async def cmd_del_channel(self, ctx: commands.Context, *args: Any) -> None:
         channel_name = args[0]
-
-        with db_session:
-            channel = db.Channel.get(name=channel_name)
-
-            if channel:
-                channel.delete()
-                await self.bot.part_channels([channel_name])
-                await ctx.reply(f'The user @{channel_name} has been removed from the database.')
-            else:
-                await ctx.reply(f'The user @{channel_name} is not in the database.')
+        try:
+            channel = Channel.get(Channel.name == channel_name)
+            channel.delete_instance()
+            channel.save()
+            await self.bot.part_channels([channel_name])
+            await ctx.reply(f'The user @{channel_name} has been removed from the database.')
+        except DoesNotExist:
+            await ctx.reply(f'The user @{channel_name} is not in the database.')
 
 
 def prepare(bot: Haxbod) -> None:

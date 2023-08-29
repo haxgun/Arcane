@@ -6,12 +6,12 @@ name = "pypi"
 [packages]
 twitchio = "*"
 python-dotenv = "*"
-pony = "*"
 requests = "*"
 rich = "*"
 emoji = "*"
 python-dateutil = "*"
 pytz = "*"
+peewee = "*"
 
 [dev-packages]
 
