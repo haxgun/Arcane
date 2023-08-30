@@ -27,7 +27,8 @@ def remove_channel() -> None:
     existing_channel = Channel.get(Channel.name == channel_name)
 
     if existing_channel:
-        existing_channel.delete()
+        existing_channel.delete_instance()
+        existing_channel.save()
         print_success(f'User @{channel_name} has been removed from the database.')
     else:
         print_error(f'User @{channel_name} is not in the database.')

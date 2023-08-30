@@ -28,4 +28,12 @@ class Command(Model):
         database = db
 
 
-db.create_tables([Channel, Command])
+class Alias(Model):
+    name = CharField(unique=True, null=False)
+    command = ForeignKeyField(Command, backref='aliases', on_delete='CASCADE')
+
+    class Meta:
+        database = db
+
+
+db.create_tables([Channel, Command, Alias])
