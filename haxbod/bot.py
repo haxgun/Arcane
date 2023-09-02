@@ -5,9 +5,9 @@ from pathlib import Path
 from twitchio import Message
 from twitchio.ext import commands
 from haxbod import settings
-from haxbod.models import Channel
+from haxbod.models import Channel, Command, Alias
 from haxbod.utils.print import print_success, print_error
-from haxbod.utils.custom_commands import find_custom_command, custom_command_response
+from haxbod.utils.custom_commands import custom_command_response, alias_response, find_entity
 from rich.console import Console
 
 console = Console()
@@ -81,13 +81,13 @@ class Haxbod(commands.Bot):
         await self.invoke_custom(context)
 
     async def invoke_custom(self, context: commands.Context) -> None:
-        if await find_custom_command(context):
+        if await find_entity(context, Command):
             response = await custom_command_response(context)
             await context.reply(response)
-            return
+        elif await find_entity(context, Alias):
+            response = await alias_response(context)
+            await context.reply(response)
+        elif context.prefix and context.is_valid:
+            self.run_event("command_invoke", context)
+            await context.command(context)
 
-        if not context.prefix or not context.is_valid:
-            return
-
-        self.run_event("command_invoke", context)
-        await context.command(context)
