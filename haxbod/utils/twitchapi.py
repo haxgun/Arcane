@@ -116,28 +116,25 @@ async def get_game_name(new_game: str) -> Optional[str]:
             return
 
 
-# These commands do not work with the bot token.
-# Therefore, they were disabled. Looking for a solution.
+async def change_stream_game(channel_name: str, game_id: str) -> bool:
+    channel_id = await get_broadcaster_id(channel_name)
+    if channel_id:
+        url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
+        payload = {'game_id': game_id}
+        async with aiohttp.ClientSession() as session:
+            async with session.patch(url, headers=headers, json=payload) as response:
+                if response.status == 204:
+                    return True
+    return False
 
-# async def change_stream_game(channel_name: str, game_id: str) -> bool:
-#     channel_id = await get_broadcaster_id(channel_name)
-#     if channel_id:
-#         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
-#         payload = {'game_id': game_id}
-#         async with aiohttp.ClientSession() as session:
-#             async with session.patch(url, headers=headers, json=payload) as response:
-#                 if response.status == 204:
-#                     return True
-#     return False
-#
-#
-# async def set_stream_title(channel_name: str, *, title: str) -> bool:
-#     channel_id = await get_broadcaster_id(channel_name)
-#     if channel_id:
-#         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
-#         payload = {'title': title}
-#         async with aiohttp.ClientSession() as session:
-#             async with session.patch(url, headers=headers, json=payload) as response:
-#                 if response.status == 204:
-#                     return True
-#     return False
+
+async def set_stream_title(channel_name: str, *, title: str) -> bool:
+    channel_id = await get_broadcaster_id(channel_name)
+    if channel_id:
+        url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
+        payload = {'title': title}
+        async with aiohttp.ClientSession() as session:
+            async with session.patch(url, headers=headers, json=payload) as response:
+                if response.status == 204:
+                    return True
+    return False
