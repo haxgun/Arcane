@@ -82,12 +82,27 @@ class Haxbod(commands.Bot):
         await self.invoke_custom(context)
 
     async def invoke_custom(self, context: commands.Context) -> None:
+        entity = None
+        response = None
+        count = 1
+
+        if context.author.is_broadcaster or context.author.is_mod:
+            if len(context.message.content.split()) > 1:
+                try:
+                    count = int(context.message.content.split()[1])
+                except ValueError:
+                    pass
+
         if await find_entity(context, Command):
+            entity = Command
             response = await custom_command_response(context)
-            await context.reply(response)
         elif await find_entity(context, Alias):
+            entity = Alias
             response = await alias_response(context)
-            await context.reply(response)
+
+        if entity and response:
+            for _ in range(count):
+                await context.send(response) if count > 1 else await context.reply(response)
         elif context.prefix and context.is_valid:
             self.run_event("command_invoke", context)
             await context.command(context)
