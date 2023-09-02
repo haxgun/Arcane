@@ -30,12 +30,13 @@ class Haxbod(commands.Bot):
         if self.extensions:
             with console.status("[bold green]Installation of cogs begins...") as status:
                 for ext in self.extensions:
-                    try:
-                        self.load_module(f'haxbod.cogs.{ext}')
-                        print_success(f'"{ext.capitalize()}" cog loaded.')
-                    except Exception:
-                        print_error(f'"{ext.capitalize()}" cog doesn\'t load.')
-                        console.print_exception()
+                    if not ext.startswith('disabled'):
+                        try:
+                            self.load_module(f'haxbod.cogs.{ext}')
+                            print_success(f'"{ext.capitalize()}" cog loaded.')
+                        except Exception:
+                            print_error(f'"{ext.capitalize()}" cog doesn\'t load.')
+                            console.print_exception()
 
     def run(self) -> None:
         self.setup()
