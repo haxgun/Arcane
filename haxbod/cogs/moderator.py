@@ -33,74 +33,121 @@ class Moderator(commands.Cog):
     @commands.command(name='addcommand', aliases=['addcmd'])
     @permission('moderator', 'broadcaster')
     async def cmd_add_command(self, ctx: commands.Context, *args: str) -> None:
-        if len(args) >= 2:
-            command_name = args[0]
-            response = ' '.join(args[1:])
-            if starts_with_emoji(command_name):
-                await ctx.reply(f'Command must not contain an emoji!')
-                return
-            channel = Channel.get(Channel.name == ctx.channel.name)
-            try:
-                command = Command.get(Command.name == command_name, Command.channel == channel)
-                await ctx.reply(f'Command !{command_name} already exists.')
-            except DoesNotExist:
-                command = Command.create(
-                    name=command_name,
-                    response=response,
-                    channel=channel
-                )
-                await ctx.reply(f'Command !{command_name} has been added.')
-        else:
+        if len(args) < 2:
             await self.send_usage(ctx)
+            return
+        command_name = args[0]
+        response = ' '.join(args[1:])
+        if starts_with_emoji(command_name):
+            await ctx.reply(f'Command must not contain an emoji!')
+            return
+        channel = Channel.get(Channel.name == ctx.channel.name)
+        try:
+            command = Command.get(Command.name == command_name, Command.channel == channel)
+            await ctx.reply(f'Command !{command_name} already exists.')
+        except DoesNotExist:
+            command = Command.create(
+                name=command_name,
+                response=response,
+                channel=channel
+            )
+            await ctx.reply(f'Command !{command_name} has been added.')
 
     @commands.command(name='rmcommand', aliases=['rmcmd'])
     @permission('moderator', 'broadcaster')
     async def cmd_delete_command(self, ctx: commands.Context, *args: str) -> None:
-        if len(args) >= 1:
-            command_name = args[0]
-            try:
-                channel = Channel.get(Channel.name == ctx.channel.name)
-                command = Command.get(Command.name == command_name, Command.channel == channel)
-                command.delete_instance()
-                command.save()
-                await ctx.reply(f'Command !{command_name} has been deleted.')
-            except DoesNotExist:
-                await ctx.reply(f'Command !{command_name} not found.')
-        else:
+        if len(args) < 1:
             await self.send_usage(ctx)
+            return
+        command_name = args[0]
+        try:
+            channel = Channel.get(Channel.name == ctx.channel.name)
+            command = Command.get(Command.name == command_name, Command.channel == channel)
+            command.delete_instance()
+            command.save()
+            await ctx.reply(f'Command !{command_name} has been deleted.')
+        except DoesNotExist:
+            await ctx.reply(f'Command !{command_name} not found.')
 
     @commands.command(name='editcommand', aliases=['editcmd'])
     @permission('moderator', 'broadcaster')
     async def cmd_edit_command(self, ctx: commands.Context, *args: str) -> None:
-        if len(args) >= 2:
-            command_name = args[0]
-            new_response = ' '.join(args[1:])
-
-            try:
-                channel = Channel.get(Channel.name == ctx.channel.name)
-                command = Command.get(Command.name == command_name, Command.channel == channel)
-                command.response = new_response
-                command.save()
-                await ctx.reply(f'Command !{command_name} has been updated.')
-            except DoesNotExist:
-                await ctx.reply(f'Command !{command_name} not found.')
-        else:
+        if len(args) < 2:
             await self.send_usage(ctx)
+            return
+        command_name = args[0]
+        new_response = ' '.join(args[1:])
+
+        try:
+            channel = Channel.get(Channel.name == ctx.channel.name)
+            command = Command.get(Command.name == command_name, Command.channel == channel)
+            command.response = new_response
+            command.save()
+            await ctx.reply(f'Command !{command_name} has been updated.')
+        except DoesNotExist:
+            await ctx.reply(f'Command !{command_name} not found.')
 
     @commands.command(name='spam', aliases=['sm'])
     @permission('moderator', 'broadcaster')
     async def cmd_spam(self, ctx: commands.Context, *args: str) -> None:
-        if len(args) >= 2:
-            count = int(args[0])
-            max_count = 20
-            if count < max_count:
-                response = ' '.join(args[1:])
-                for _ in range(count):
-                    await ctx.send(response)
-            else:
-                await ctx.reply(f'Error! Count must be less than {max_count}!')
-        else:
+        if len(args) < 1:
             await ctx.reply('Usage: !spam <count> <response>')
+            return
+        count = int(args[0])
+        max_count = 20
+        if count < max_count:
+            response = ' '.join(args[1:])
+            for _ in range(count):
+                await ctx.send(response)
+        else:
+            await ctx.reply(f'Error! Count must be less than {max_count}!')
+
+    @commands.command(name='aliases', aliases=['als'])
+    async def cmd_aliases(self, ctx: commands.Context) -> None:
+        channel = Channel.get(Channel.name == ctx.channel.name)
+        aliases = Alias.select().join(Command).where(Command.channel == channel)
+        if aliases:
+            aliases_str = ', '.join([alias.name for alias in aliases])
+            await ctx.send(f"Aliases: {aliases_str}")
+        else:
+            await ctx.send("No aliases")
+
+    @commands.command(name='addalias', aliases=['addals'])
+    @permission('moderator', 'broadcaster')
+    async def cmd_add_aliases(self, ctx: commands.Context, *args: str) -> None:
+        if len(args) < 2:
+            await self.send_usage(ctx)
+            return
+        command_name, alias_name = args[0], args[1]
+        if starts_with_emoji(command_name):
+            await ctx.reply(f'Command must not contain an emoji!')
+            return
+        channel = Channel.get(name=ctx.channel.name)
+        command = Command.get_or_none(name=command_name, channel=channel)
+        if command:
+            alias = Alias.get_or_none(name=alias_name, channel=channel)
+            if alias:
+                await ctx.send(f"Alias '{alias_name}' already exists.")
+            else:
+                Alias.create(name=alias_name, command=command, channel=channel)
+                await ctx.send(f"Alias '{alias_name}' for command '{command_name}' created successfully.")
+            return
+        await ctx.send(f"Command '{command_name}' not found.")
+
+    @commands.command(name='rmalias', aliases=['rmals'])
+    @permission('moderator', 'broadcaster')
+    async def cmd_remove_aliases(self, ctx: commands.Context, *args: str) -> None:
+        if len(args) < 2:
+            await self.send_usage(ctx)
+            return
+        alias_name = args[1]
+        channel = Channel.get(name=ctx.channel.name)
+        alias = Alias.get_or_none(name=alias_name, channel=channel)
+        if alias:
+            alias.delete_instance()
+            await ctx.send(f"Alias '{alias_name}' has been deleted.")
+            return
+        await ctx.send(f"Alias '{alias_name}' not found.")
 
     # These commands do not work with the bot token.
     # Therefore, they were disabled. Looking for a solution.
