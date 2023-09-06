@@ -10,7 +10,7 @@ from haxbod.utils.decorators import permission
 class Moderator(commands.Cog):
     __slots__ = 'bot'
 
-    def __init__(self, bot: Haxbod) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @staticmethod
@@ -36,27 +36,33 @@ class Moderator(commands.Cog):
 
     @commands.command(name='commands', aliases=['cmds'])
     async def cmd_commands(self, ctx: commands.Context, subcommand: str = None, *args: str) -> None:
-        if subcommand:
-            subcommand_handlers = {
-                'add': self.cmd_add_command,
-                'a': self.cmd_add_command,
-                'remove': self.cmd_remove_command,
-                'rm': self.cmd_remove_command,
-                'r': self.cmd_remove_command,
-                'edit': self.cmd_edit_command,
-                'e': self.cmd_edit_command,
-            }
+        subcommand_handlers = {
+            'add': self.cmd_add_command,
+            'a': self.cmd_add_command,
+            'remove': self.cmd_remove_command,
+            'rm': self.cmd_remove_command,
+            'r': self.cmd_remove_command,
+            'edit': self.cmd_edit_command,
+            'e': self.cmd_edit_command,
+        }
 
-            subcommand = subcommand.lower()
-            if subcommand in subcommand_handlers:
-                await subcommand_handlers[subcommand](ctx, *args)
-                return
+        if subcommand and subcommand.lower() in subcommand_handlers:
+            await subcommand_handlers[subcommand.lower()](ctx, *args)
+            return
+
+        user_cog = self.bot.get_cog('User')
+        user_commands = ', '.join([command for command in user_cog.commands]) if user_cog else ''
 
         channel = Channel.get(Channel.name == ctx.channel.name)
-        commands_list = Command.select().where(Command.channel == channel)
-        if commands_list:
-            commands_str = ', '.join([command.name for command in commands_list])
-            await ctx.reply(f'Commands: {commands_str}')
+        custom_commands_list = Command.select().where(Command.channel == channel)
+        custom_commands = ', '.join([custom_command.name for custom_command in custom_commands_list])
+
+        if user_cog and custom_commands:
+            await ctx.reply(f'Commands: {user_commands}, {custom_commands}')
+        elif user_cog:
+            await ctx.reply(f'Commands: {user_commands}')
+        elif custom_commands:
+            await ctx.reply(f'Commands: {custom_commands}')
         else:
             await ctx.reply(f'No commands.')
 
@@ -195,5 +201,5 @@ class Moderator(commands.Cog):
             await ctx.reply('❌')
 
 
-def prepare(bot: Haxbod) -> None:
+def prepare(bot: commands.Bot) -> None:
     bot.add_cog(Moderator(bot))
