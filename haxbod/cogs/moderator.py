@@ -19,6 +19,7 @@ class Moderator(commands.Cog):
         sub_command = ctx.message.content.split()[1]
         await ctx.reply(f'Usage: {main_command} {sub_command} <command> <response>')
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='spam', aliases=['sm'])
     @permission('moderator', 'broadcaster')
     async def cmd_spam(self, ctx: commands.Context, *args: str) -> None:
@@ -34,6 +35,7 @@ class Moderator(commands.Cog):
         else:
             await ctx.reply(f'Error! Count must be less than {max_count}!')
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='commands', aliases=['cmds'])
     async def cmd_commands(self, ctx: commands.Context, subcommand: str = None, *args: str) -> None:
         subcommand_handlers = {

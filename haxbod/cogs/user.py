@@ -16,6 +16,7 @@ class User(commands.Cog):
     def __init__(self, bot: Haxbod) -> None:
         self.bot = bot
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='8ball', aliases=['8b'])
     async def cmd_eight_ball(self, ctx: commands.Context) -> None:
         eight_ball_responses = (
@@ -42,6 +43,7 @@ class User(commands.Cog):
         )
         await ctx.reply(choice(eight_ball_responses))
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='accountage', aliases=['age'])
     async def cmd_accountage(self, ctx: commands.Context) -> None:
         channel_name = ctx.author.name
@@ -75,6 +77,7 @@ class User(commands.Cog):
         else:
             return
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='uptime')
     async def cmd_uptime(self, ctx: commands.Context) -> None:
         channel_name = ctx.channel.name
@@ -99,6 +102,7 @@ class User(commands.Cog):
         else:
             await ctx.reply("Offline")
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='followsince')
     async def cmd_followsince(self, ctx: commands.Context) -> None:
         target_user = ctx.author.name
@@ -126,6 +130,7 @@ class User(commands.Cog):
         else:
             await ctx.reply(f"You're not followed to the channel!")
 
+    @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
     @commands.command(name='followage')
     async def cmd_followage(self, ctx: commands.Context) -> None:
         target_user = ctx.author.name
