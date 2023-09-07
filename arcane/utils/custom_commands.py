@@ -1,7 +1,7 @@
 from peewee import DoesNotExist
 from twitchio.ext import commands
 import emoji
-from haxbod.models import Channel, Command, Alias
+from arcane.models import Channel, Command, Alias
 
 
 def starts_with_emoji(text):

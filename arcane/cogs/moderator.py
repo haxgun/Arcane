@@ -1,16 +1,16 @@
 from peewee import DoesNotExist
 from twitchio.ext import commands
 
-from haxbod.bot import Haxbod
-from haxbod.models import Channel, Command, Alias
-from haxbod.utils.custom_commands import starts_with_emoji
-from haxbod.utils.decorators import permission
+from arcane.bot import Arcane
+from arcane.models import Channel, Command, Alias
+from arcane.utils.custom_commands import starts_with_emoji
+from arcane.utils.decorators import permission
 
 
 class Moderator(commands.Cog):
     __slots__ = 'bot'
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Arcane) -> None:
         self.bot = bot
 
     @staticmethod
@@ -203,5 +203,5 @@ class Moderator(commands.Cog):
             await ctx.reply('❌')
 
 
-def prepare(bot: commands.Bot) -> None:
+def prepare(bot: Arcane) -> None:
     bot.add_cog(Moderator(bot))

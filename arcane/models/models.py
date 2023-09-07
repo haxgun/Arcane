@@ -1,6 +1,6 @@
 from typing import List
 
-from haxbod import settings
+from arcane import settings
 
 from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField
 

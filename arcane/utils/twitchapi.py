@@ -6,7 +6,7 @@ from typing import Optional
 
 import aiohttp
 import requests
-from haxbod import settings
+from arcane import settings
 
 client_id = settings.CLIENT_ID
 access_token = settings.ACCESS_TOKEN

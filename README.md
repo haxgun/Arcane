@@ -1,26 +1,19 @@
-<p></p>
-<p align="center">
-	<img width="300" src="docs/media/logo_dark.png#gh-light-mode-only"/>
-	<img width="300" src="docs/media/logo_light.png#gh-dark-mode-only"/>
-</p>
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11.4-informational.svg">
-  <img src="https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg">
-  <a href="https://github.com/starlitskies7/haxbod/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/haxgun/haxbod">
-  </a>
-</p>
+# ⚗️ Arcane
+<img src="https://img.shields.io/badge/Python-3.11.4-informational.svg">
+<img src="https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg">
+<a href="https://github.com/haxgun/Arcane/blob/main/LICENSE">
+  <img src="https://img.shields.io/github/license/haxgun/Aaxbod">
+</a>
 
----
 
 ## ⚡️ Installation
 **Required components:**
 - Twitch Account for Bot
-- Python 3.11.4
+- Python 3.7+
 - Pipenv or venv
 - VSCode or Pycharm
 
-To set up the Haxbod, follow these steps:
+To set up the Arcane, follow these steps:
 1. Install [pipenv](https://pipenv.pypa.io/en/latest/).
 2. Clone the repository
 3. Install the necessary packages with `pipenv install`
@@ -34,7 +27,7 @@ To set up the Haxbod, follow these steps:
 > `pipenv run removechannel `
 
 ## 🗃️ Structure
-* `/haxbod`: main folder of the bot
+* `/arcane`: main folder of the bot
     * `/cogs`: cogs folder
     * `/settings`: configuration settings of the bot
     * `/models`: modules for Database
@@ -42,4 +35,4 @@ To set up the Haxbod, follow these steps:
 * `main.py`: main file for launch bot
 
 ## 📄 License
-[Haxbot](https://github.com/haxgun/haxbod) is completely free and has an [the MIT license](https://github.com/haxgun/haxbod/blob/main/LICENSE). If you want, you can put a star on Github.
+[Arcane](https://github.com/haxgun/Arcane) is completely free and has an [the MIT license](https://github.com/haxgun/Arcane/blob/main/LICENSE). If you want, you can put a star on Github.

@@ -1,14 +1,14 @@
 from twitchio.ext import commands
 
-from haxbod.bot import Haxbod
-from haxbod.utils.decorators import permission
-from haxbod.utils.twitchapi import get_stream_title, get_game_id, set_stream_title, change_stream_game, get_game_name
+from arcane.bot import Arcane
+from arcane.utils.decorators import permission
+from arcane.utils.twitchapi import get_stream_title, get_game_id, set_stream_title, change_stream_game, get_game_name
 
 
 class Stream(commands.Cog):
     __slots__ = 'bot'
 
-    def __init__(self, bot: Haxbod) -> None:
+    def __init__(self, bot: Arcane) -> None:
         self.bot = bot
 
     @commands.command(name='title')
@@ -47,5 +47,5 @@ class Stream(commands.Cog):
             await ctx.send("Game not found.")
 
 
-def prepare(bot: Haxbod) -> None:
+def prepare(bot: Arcane) -> None:
     bot.add_cog(Stream(bot))

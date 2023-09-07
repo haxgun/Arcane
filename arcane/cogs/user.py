@@ -6,14 +6,14 @@ from random import choice
 
 from twitchio.ext import commands
 
-from haxbod.bot import Haxbod
-from haxbod.utils.twitchapi import get_user_creation, get_stream_started_at, get_broadcaster_id, get_followers
+from arcane.bot import Arcane
+from arcane.utils.twitchapi import get_user_creation, get_stream_started_at, get_broadcaster_id, get_followers
 
 
 class User(commands.Cog):
     __slots__ = 'bot'
 
-    def __init__(self, bot: Haxbod) -> None:
+    def __init__(self, bot: Arcane) -> None:
         self.bot = bot
 
     @commands.cooldown(rate=1, per=5, bucket=commands.Bucket.member)
@@ -160,5 +160,5 @@ class User(commands.Cog):
             await ctx.reply(f"You're not followed to the channel!")
 
 
-def prepare(bot: Haxbod) -> None:
+def prepare(bot: Arcane) -> None:
     bot.add_cog(User(bot))

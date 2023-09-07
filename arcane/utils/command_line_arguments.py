@@ -1,9 +1,9 @@
-from haxbod.bot import Haxbod
-from haxbod.models import Channel
-from haxbod.utils.twitchapi import existing_channel_twitch
-from haxbod.utils.print import print_success, print_error, input_answer
+from arcane.bot import Arcane
+from arcane.models import Channel
+from arcane.utils.twitchapi import existing_channel_twitch
+from arcane.utils.print import print_success, print_error, input_answer
 
-bot = Haxbod()
+bot = Arcane()
 
 
 def add_channel() -> None:

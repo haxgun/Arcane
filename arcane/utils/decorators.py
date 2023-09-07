@@ -2,7 +2,7 @@ from typing import List, Callable
 
 from twitchio.ext import commands
 
-from haxbod import settings
+from arcane import settings
 
 
 def owner_only() -> Callable[..., None]:

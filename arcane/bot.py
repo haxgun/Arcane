@@ -4,21 +4,21 @@ from pathlib import Path
 
 from twitchio import Message
 from twitchio.ext import commands
-from haxbod import settings
-from haxbod.models import Channel, Command, Alias
-from haxbod.utils.print import print_success, print_error
-from haxbod.utils.custom_commands import custom_command_response, alias_response, find_entity
+from arcane import settings
+from arcane.models import Channel, Command, Alias
+from arcane.utils.print import print_success, print_error
+from arcane.utils.custom_commands import custom_command_response, alias_response, find_entity
 from rich.console import Console
 
 console = Console()
 
 
-class Haxbod(commands.Bot):
+class Arcane(commands.Bot):
     __slots__ = ('ready', 'extensions')
 
     def __init__(self) -> None:
         self.ready = False
-        self.extensions = [p.stem for p in Path(f'{settings.BASE_DIR}/haxbod/cogs/').glob('*.py')]
+        self.extensions = [p.stem for p in Path(f'{settings.BASE_DIR}/arcane/cogs/').glob('*.py')]
 
         super().__init__(
             token=settings.ACCESS_TOKEN,
@@ -32,7 +32,7 @@ class Haxbod(commands.Bot):
                 for ext in self.extensions:
                     if not ext.startswith('disabled'):
                         try:
-                            self.load_module(f'haxbod.cogs.{ext}')
+                            self.load_module(f'arcane.cogs.{ext}')
                             print_success(f'"{ext.capitalize()}" cog loaded.')
                         except Exception:
                             print_error(f'"{ext.capitalize()}" cog doesn\'t load.')

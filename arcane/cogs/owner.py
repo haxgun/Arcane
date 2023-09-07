@@ -4,15 +4,15 @@ from typing import Any
 from peewee import IntegrityError, DoesNotExist
 from twitchio.ext import commands
 
-from haxbod.bot import Haxbod
-from haxbod.models import Channel
-from haxbod.utils.decorators import owner_only
+from arcane.bot import Arcane
+from arcane.models import Channel
+from arcane.utils.decorators import owner_only
 
 
 class Owner(commands.Cog):
     __slots__ = 'bot'
 
-    def __init__(self, bot: Haxbod) -> None:
+    def __init__(self, bot: Arcane) -> None:
         self.bot = bot
 
     @commands.command(name='addchannel', aliases=['addchl'])
@@ -46,5 +46,5 @@ class Owner(commands.Cog):
             await ctx.reply(f'The user @{channel_name} is not in the database.')
 
 
-def prepare(bot: Haxbod) -> None:
+def prepare(bot: Arcane) -> None:
     bot.add_cog(Owner(bot))
