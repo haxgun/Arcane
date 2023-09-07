@@ -7,7 +7,7 @@ from random import choice
 from twitchio.ext import commands
 
 from arcane.bot import Arcane
-from arcane.utils.twitchapi import get_user_creation, get_stream_started_at, get_broadcaster_id, get_followers
+from arcane.utils.twitchapi import get_user_creation, get_stream_started_at, get_followers
 
 
 class User(commands.Cog):
