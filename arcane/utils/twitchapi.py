@@ -138,3 +138,13 @@ async def set_stream_title(channel_name: str, *, title: str) -> bool:
                 if response.status == 204:
                     return True
     return False
+
+
+async def api_latency() -> Optional[int]:
+    start_time = time.time()
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://gql.twitch.tv/gql', timeout=5) as response:
+            end_time = time.time()
+            latency = round((end_time - start_time) * 1000)
+            return latency

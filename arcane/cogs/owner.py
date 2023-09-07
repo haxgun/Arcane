@@ -7,6 +7,8 @@ from twitchio.ext import commands
 from arcane.bot import Arcane
 from arcane.models import Channel
 from arcane.utils.decorators import owner_only
+from arcane.utils.twitchapi import api_latency
+
 
 
 class Owner(commands.Cog):
@@ -44,6 +46,16 @@ class Owner(commands.Cog):
             await ctx.reply(f'The user @{channel_name} has been removed from the database.')
         except DoesNotExist:
             await ctx.reply(f'The user @{channel_name} is not in the database.')
+
+    @commands.command(name='bot')
+    @owner_only()
+    async def cmd_bot_info(self, ctx: commands.Context, *args: Any) -> None:
+        api_latency_ms = await api_latency()
+
+        if api_latency:
+            await ctx.reply(f'⚡ Bot online! 🏓 API {api_latency_ms}ms')
+        else:
+            await ctx.reply(f'⚡ Bot online!')
 
 
 def prepare(bot: Arcane) -> None:
