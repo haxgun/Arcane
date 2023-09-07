@@ -1,10 +1,7 @@
 # ⚗️ Arcane
-<img src="https://img.shields.io/badge/Python-3.11.4-informational.svg">
-<img src="https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg">
-<a href="https://github.com/haxgun/Arcane/blob/main/LICENSE">
-  <img src="https://img.shields.io/github/license/haxgun/Aaxbod">
-</a>
-
+[![GitHub License](https://img.shields.io/github/license/haxgun/Arcane)](https://github.com/haxgun/Arcane/blob/main/LICENSE)
+![Python Version](https://img.shields.io/badge/Python-3.11.4-informational.svg)
+![TwitchIO Version](https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg)
 
 ## ⚡️ Installation
 **Required components:**
