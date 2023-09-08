@@ -79,7 +79,7 @@ async def handle_custom_commands(context: commands.Context) -> None:
     if entity and response:
         user_id = context.message.author.id
         command = context.message.content.split()[0][1:]
-        cooldown_duration = 10
+        cooldown_duration = 5
         if await can_use_command(user_id, command, cooldown_duration):
             await update_command_cooldown(user_id, command)
             for _ in range(count):
