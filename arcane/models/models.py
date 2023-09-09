@@ -2,7 +2,9 @@ from typing import List
 
 from arcane import settings
 
-from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField
+from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField, IntegerField
+
+from arcane.settings import PREFIX
 
 db = SqliteDatabase(settings.DB_NAME)
 
@@ -17,6 +19,9 @@ class BaseModel(Model):
 
 
 class Channel(BaseModel):
+    prefix = CharField(default=PREFIX, max_length=1)
+    cooldown = IntegerField(default=5)
+
     class Meta:
         db_table = 'channels'
 
