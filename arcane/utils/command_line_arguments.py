@@ -35,5 +35,4 @@ def remove_channel() -> None:
 
 
 def run_bot() -> None:
-    bot.run()
-
+    raise SystemExit(bot.run())
