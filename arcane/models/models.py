@@ -20,6 +20,7 @@ class BaseModel(Model):
 class Channel(BaseModel):
     prefix = CharField(default=PREFIX, max_length=1)
     cooldown = IntegerField(default=5)
+    valorant = CharField(null=True)
 
     class Meta:
         db_table = 'channels'
