@@ -244,8 +244,8 @@ class Arcane:
             return
 
         # message = self.parse_message(received_msg)
-
-        console.print(received_msg)
+        message = Message.parse(received_msg)
+        console.print(message)
 
         # if message.irc_command == 'PING':
         #     """ Tell remote we're still alive """
