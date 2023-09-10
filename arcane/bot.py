@@ -273,6 +273,8 @@ class Arcane:
         try:
             while True:
                 received_msgs = self.irc.recv(2048).decode()
+                if not received_msgs:
+                    continue
                 for received_msg in received_msgs.split('\r\n'):
                     self.handle_message(received_msg)
         except KeyboardInterrupt:
