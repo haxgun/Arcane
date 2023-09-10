@@ -221,67 +221,6 @@ class Arcane:
             return domain
         return None
 
-    def parse_message(self, received_msg: str) -> Message:
-        """
-        Parses an incoming IRC message into a Message object.
-
-        Parameters:
-            received_msg (str): The raw IRC message.
-
-        Returns:
-            Message: The parsed Message object.
-        """
-        parts = received_msg.split(' ')
-
-        prefix = None
-        author = None
-        channel = None
-        content = None
-        content_command = None
-        content_args = None
-        irc_command = None
-        irc_args = None
-
-        if parts[0].startswith(':'):
-            prefix = parts[0][1:]
-            author = self.get_user_from_prefix(prefix)
-            parts = parts[1:]
-
-        text_start = next(
-            (idx for idx, part in enumerate(parts) if part.startswith(':')),
-            None
-        )
-        if text_start is not None:
-            text_parts = parts[text_start:]
-            text_parts[0] = text_parts[0][1:]
-            content = ' '.join(text_parts)
-            content_command = text_parts[0]
-            content_args = text_parts[1:]
-            parts = parts[:text_start]
-
-        irc_command = parts[0]
-        irc_args = parts[1:]
-
-        hash_start = next(
-            (idx for idx, part in enumerate(irc_args) if part.startswith('#')),
-            None
-        )
-        if hash_start is not None:
-            channel = irc_args[hash_start][1:]
-
-        message = Message(
-            prefix=prefix,
-            author=author,
-            channel=channel,
-            irc_command=irc_command,
-            irc_args=irc_args,
-            content=content,
-            content_command=content_command,
-            content_args=content_args
-        )
-
-        return message
-
     def handle_template_command(self, message: Message, text_command: str, template: str) -> None:
         """
         Handles a template command and sends a response to the channel.
