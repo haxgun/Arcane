@@ -1,9 +1,8 @@
 from typing import List
 
-from arcane import settings
-
 from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField, IntegerField
 
+from arcane import settings
 from arcane.settings import PREFIX
 
 db = SqliteDatabase(settings.DB_NAME)

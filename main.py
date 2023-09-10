@@ -3,8 +3,8 @@
 
 import argparse
 
-from arcane.utils.print import print_error
-from arcane.utils.command_line_arguments import add_channel, run_bot, remove_channel
+from arcane.modules.print import print_error
+from arcane.modules.command_line_arguments import add_channel, run_bot, remove_channel
 
 
 def main():
