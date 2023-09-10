@@ -190,7 +190,8 @@ class Arcane:
         """
         self.setup()
 
-    def _shutdown(self, exit: bool = False) -> None:
+    @staticmethod
+    def _shutdown(exit: bool = False) -> None:
         """
         Stops the bot and disables using it again.
 
