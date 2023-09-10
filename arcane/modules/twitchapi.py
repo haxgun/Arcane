@@ -1,12 +1,12 @@
 import time
 from datetime import datetime
-
-import pytz
-from dateutil.parser import parse as parse_datetime
 from typing import Optional
 
 import aiohttp
+import pytz
 import requests
+from dateutil.parser import parse as parse_datetime
+
 from arcane import settings
 
 client_id = settings.CLIENT_ID

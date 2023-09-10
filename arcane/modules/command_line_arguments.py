@@ -1,7 +1,7 @@
 from arcane.bot import Arcane
 from arcane.models import Channel
-from arcane.utils.twitchapi import existing_channel_twitch
-from arcane.utils.print import print_success, print_error, input_answer
+from arcane.modules.print import print_success, print_error, input_answer
+from arcane.modules.twitchapi import existing_channel_twitch
 
 bot = Arcane()
 

@@ -5,9 +5,9 @@ from typing import Optional, Dict, Callable, List
 from rich.console import Console
 
 from arcane.models import Channel
-from arcane.settings import OAUTH_TOKEN, USERNAME, irc_server, irc_port, DEBUG
-from arcane.utils.message import Message
-from arcane.utils.print import print_success, print_error
+from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID
+from arcane.modules.dataclasses import Message
+from arcane.modules.print import print_success, print_error
 
 console = Console()
 
