@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-twitchio = "*"
 python-dotenv = "*"
 requests = "*"
 rich = "*"
@@ -12,6 +11,8 @@ emoji = "*"
 python-dateutil = "*"
 pytz = "*"
 peewee = "*"
+asyncio = "*"
+aiohttp = "*"
 
 [dev-packages]
 
