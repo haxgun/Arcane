@@ -1,5 +1,4 @@
 import asyncio
-import socket
 import ssl
 import sys
 from typing import Optional, Dict, Callable, List
@@ -7,6 +6,7 @@ from typing import Optional, Dict, Callable, List
 from rich.console import Console
 
 from arcane.models import Channel
+from arcane.modules.twitchapi import get_bot_user_id
 from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID
 from arcane.modules.dataclasses import Message
 from arcane.modules.print import print_success, print_error
@@ -40,9 +40,9 @@ class Arcane:
         'ready',
         'host',
         'port',
-        'irc',
         'reader',
         'writer',
+        'loop',
         'token',
         'username',
         'client_id',
@@ -57,7 +57,6 @@ class Arcane:
         self.ready: bool = False
         self.host: str = 'irc.chat.twitch.tv'
         self.port: int = 6697
-        self.irc = ssl.wrap_socket(socket.socket())
         self.token: str = ACCESS_TOKEN
         self.username: str = USERNAME
         self.client_id: str = CLIENT_ID
@@ -68,7 +67,7 @@ class Arcane:
             # '!randint': self.reply_with_randint,
         }
 
-    def say(self, channel: str, message: str) -> None:
+    async def say(self, channel: str, message: str) -> None:
         """
         Send a message to the specified channel.
 
@@ -88,9 +87,9 @@ class Arcane:
         while message.startswith("."):  # Use Bot.ban, Bot.timeout, etc instead
             message = message[1:]
 
-        self._send_privmsg(channel, message)
+        await self._send_privmsg(channel, message)
 
-    def _send_privmsg(self, channel: str, message: str) -> None:
+    async def _send_privmsg(self, channel: str, message: str) -> None:
         """
         Sends a PRIVMSG command to the specified channel. (Internal method)
 
@@ -102,21 +101,22 @@ class Arcane:
             This method should not be used directly as it may risk getting banned from Twitch.
         """
         message = message.replace("\n", " ")
-        self._send_command(f'PRIVMSG #{channel} :{message}')
+        print(f'> PRIVMSG #{channel} :{message}')
+        await self._send_command(f'PRIVMSG #{channel} :{message}')
 
-    def _nick(self) -> None:
+    async def _nick(self) -> None:
         """
         Sends the NICK command to the IRC server. (Internal method)
         """
-        self._send_command(f'NICK {self.username}', quiet=True)
+        await self._send_command(f'NICK {self.username}', quiet=True)
 
-    def _pass(self) -> None:
+    async def _pass(self) -> None:
         """
         Sends the PASS command with the OAuth token to the IRC server. (Internal method)
         """
-        self._send_command(f'PASS oauth:{self.token}', quiet=True)
+        await self._send_command(f'PASS oauth:{self.token}', quiet=True)
 
-    def _send_command(self, command: str, quiet: bool = False) -> None:
+    async def _send_command(self, command: str, quiet: bool = False) -> None:
         """
         Sends a raw IRC command to the server. (Internal method)
 
@@ -124,9 +124,10 @@ class Arcane:
             command (str): The IRC command to send.
             quiet (bool): If True, suppresses output to the console.
         """
-        self.irc.send((command + '\r\n').encode())
+        self.writer.write((command + '\r\n').encode())
+        return await self.writer.drain()
 
-    def _capability(self, *args) -> None:
+    async def _capability(self, *args) -> None:
         """
         Sends CAP REQ commands to enable additional events. (Internal method)
 
@@ -134,27 +135,27 @@ class Arcane:
             *args: Variable number of CAP REQ arguments.
         """
         for arg in args:
-            self._send_command(f'CAP REQ :twitch.tv/{arg}', quiet=True)
+            await self._send_command(f'CAP REQ :twitch.tv/{arg}', quiet=True)
 
-    def join_channel(self, channel) -> None:
+    async def join_channel(self, channel) -> None:
         """
         Joins a Twitch channel.
 
         Parameters:
             channel (str): The name of the channel to join.
         """
-        self._send_command(f'JOIN #{channel}')
+        await self._send_command(f'JOIN #{channel}')
 
-    def part_channel(self, channel) -> None:
+    async def part_channel(self, channel) -> None:
         """
         Parts (leaves) a Twitch channel.
 
         Parameters:
             channel (str): The name of the channel to leave.
         """
-        self._send_command(f'PART #{channel}')
+        await self._send_command(f'PART #{channel}')
 
-    def setup(self) -> None:
+    async def setup(self) -> None:
         """
         Sets up the bot by establishing connections, enabling capabilities, and joining channels.
         """
@@ -162,13 +163,17 @@ class Arcane:
         self._capability('tags', 'commands', 'membership')
         self._pass()
         self._nick()
+        self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
+        await self._capability('tags', 'commands', 'membership')
+        await self._pass()
+        await self._nick()
         with console.status("[bold] Connecting to channels.......") as status:
             for channel in self.channels:
-                self.join_channel(channel)
-        self.event_ready()
-        self._loop_for_messages()
+                await self.join_channel(channel)
+        await self.event_ready()
+        await self._loop_for_messages()
 
-    def event_ready(self) -> None:
+    async def event_ready(self) -> None:
         """
         Called when the bot is ready to work.
         """
@@ -177,7 +182,7 @@ class Arcane:
 
         self.ready = True
         bot_nick = f'[link=https://twitch.tv/{self.username}][yellow]@{self.username}[/link][/yellow]'
-        print_success(f'Connected as {bot_nick}')
+        print_success(f'Connected as {bot_nick} with ID: {self.id}')
         channel_connected = ', '.join(
             [f'[link=https://twitch.tv/{channel}][yellow]@{channel}[/link][/yellow]' for channel in
              self.channels])
@@ -188,10 +193,10 @@ class Arcane:
         """
         Runs the bot, initiating the setup process.
         """
-        self.setup()
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.setup())
 
-    @staticmethod
-    def _shutdown(exit: bool = False) -> None:
+    async def _shutdown(self, exit: bool = False) -> None:
         """
         Stops the bot and disables using it again.
 
@@ -201,28 +206,25 @@ class Arcane:
             If True, this will close the event loop and raise SystemExit. (default: False)
         """
         print_error('Goodbey!')
+        if self.writer:
+            self.writer.close()
+            self.loop.create_task(self.writer.wait_closed())
+
+        pending = asyncio.Task.all_tasks()
+        gathered = asyncio.gather(*pending)
+
+        try:
+            gathered.cancel()
+            self.loop.run_until_complete(gathered)
+            gathered.exception()
+        except:  # Can be ignored
+            pass
+
         if exit:
+            self.loop.stop()
             sys.exit(0)
 
-    @staticmethod
-    def get_user_from_prefix(prefix: str) -> Optional[str]:
-        """
-        Extracts the user from an IRC prefix.
-
-        Parameters:
-            prefix (str): The IRC prefix to extract the user from.
-
-        Returns:
-            Optional[str]: The extracted user, or None if not found.
-        """
-        domain = prefix.split('!')[0]
-        if domain.endswith('.tmi.twitch.tv'):
-            return domain.replace('.tmi.twitch.tv', '')
-        if 'tmi.twitch.tv' not in domain:
-            return domain
-        return None
-
-    def handle_template_command(self, message: Message, text_command: str, template: str) -> None:
+    async def handle_template_command(self, message: Message, text_command: str, template: str) -> None:
         """
         Handles a template command and sends a response to the channel.
 
@@ -232,9 +234,9 @@ class Arcane:
             template (str): The template for the response.
         """
         text = template.format(**{'message': message})
-        self.say(message.channel, text)
+        await self.say(message.channel, text)
 
-    def handle_message(self, received_msg: str) -> None:
+    async def handle_message(self, received_msg: str) -> None:
         """
         Handles an incoming IRC message.
 
@@ -267,16 +269,17 @@ class Arcane:
         #     if message.content_command in self.custom_commands:
         #         self.custom_commands[message.content_command](message)
 
-    def _loop_for_messages(self) -> None:
+    async def _loop_for_messages(self) -> None:
         """
         Main loop for processing incoming IRC messages.
         """
         try:
             while True:
-                received_msgs = self.irc.recv(2048).decode()
-                if not received_msgs:
+                received_msgs = await self.reader.readline()
+                mgs = received_msgs.decode()
+                if not mgs:
                     continue
-                for received_msg in received_msgs.split('\r\n'):
-                    self.handle_message(received_msg)
+                for msg in mgs.split('\r\n'):
+                    await self.handle_message(msg)
         except KeyboardInterrupt:
-            self._shutdown(exit=True)
+            await self._shutdown(exit=True)
