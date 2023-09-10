@@ -46,6 +46,7 @@ class Arcane:
         'token',
         'username',
         'client_id',
+        'id',
         'channels',
         'custom_commands',
     )
@@ -159,11 +160,8 @@ class Arcane:
         """
         Sets up the bot by establishing connections, enabling capabilities, and joining channels.
         """
-        self.irc.connect((self.host, self.port))
-        self._capability('tags', 'commands', 'membership')
-        self._pass()
-        self._nick()
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
+        self.id = await get_bot_user_id()
         await self._capability('tags', 'commands', 'membership')
         await self._pass()
         await self._nick()

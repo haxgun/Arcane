@@ -17,6 +17,14 @@ headers = {
 }
 
 
+async def get_bot_user_id() -> int:
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://api.twitch.tv/helix/users', headers=headers) as response:
+            data = await response.json()
+            if 'data' in data and len(data['data']) > 0:
+                return data['data'][0]['id']
+
+
 def existing_channel_twitch(channel_name: str) -> bool:
     url = f'https://api.twitch.tv/helix/users?login={channel_name}'
     response = requests.get(url, headers=headers)
