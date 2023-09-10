@@ -5,7 +5,7 @@
 ## ⚡️ Installation
 **Required components:**
 - Twitch Account for Bot
-- Python 3.7+
+- Python 3.10+
 - Pipenv or venv
 - VSCode or Pycharm
 
