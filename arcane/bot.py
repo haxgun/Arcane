@@ -62,11 +62,7 @@ class Arcane:
         self.username: str = USERNAME
         self.client_id: str = CLIENT_ID
         self.channels: List[str] = Channel.get_all_channel_names()
-        self.custom_commands: Dict[str, Callable[[Message], None]] = {
-            # '!date': self.reply_with_date,
-            # '!ping': self.reply_to_ping,
-            # '!randint': self.reply_with_randint,
-        }
+        self.custom_commands: Dict[str, Callable[[Message], None]] = {}
 
     async def say(self, channel: str, message: str) -> None:
         """
