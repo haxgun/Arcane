@@ -161,7 +161,7 @@ class Arcane:
         await self._capability('tags', 'commands', 'membership')
         await self._pass()
         await self._nick()
-        with console.status("[bold] Connecting to channels.......") as status:
+        with console.status("[bold] Connecting to channels...") as status:
             for channel in self.channels:
                 await self.join_channel(channel)
         await self.event_ready()
