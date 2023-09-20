@@ -52,9 +52,6 @@ class Arcane:
     )
 
     def __init__(self) -> None:
-        """
-        Initializes a new instance of the Arcane bot.
-        """
         self.ready: bool = False
         self.host: str = 'irc.chat.twitch.tv'
         self.port: int = 6697
@@ -65,17 +62,6 @@ class Arcane:
         self.custom_commands: Dict[str, Callable[[Message], None]] = {}
 
     async def say(self, channel: str, message: str) -> None:
-        """
-        Send a message to the specified channel.
-
-        Parameters:
-            channel (str): The channel to send the message to.
-            message (str): The message to send.
-
-        Raises:
-            Exception: If the message exceeds the maximum allowed length (500 characters).
-        """
-
         if len(message) > 500:
             raise Exception(
                 "The maximum amount of characters in one message is 500,"
@@ -87,75 +73,31 @@ class Arcane:
         await self._send_privmsg(channel, message)
 
     async def _send_privmsg(self, channel: str, message: str) -> None:
-        """
-        Sends a PRIVMSG command to the specified channel. (Internal method)
-
-        Parameters:
-            channel (str): The channel to send the message to.
-            message (str): The message to send.
-
-        Note:
-            This method should not be used directly as it may risk getting banned from Twitch.
-        """
         message = message.replace("\n", " ")
         print(f'> PRIVMSG #{channel} :{message}')
         await self._send_command(f'PRIVMSG #{channel} :{message}')
 
     async def _nick(self) -> None:
-        """
-        Sends the NICK command to the IRC server. (Internal method)
-        """
         await self._send_command(f'NICK {self.username}', quiet=True)
 
     async def _pass(self) -> None:
-        """
-        Sends the PASS command with the OAuth token to the IRC server. (Internal method)
-        """
         await self._send_command(f'PASS oauth:{self.token}', quiet=True)
 
     async def _send_command(self, command: str, quiet: bool = False) -> None:
-        """
-        Sends a raw IRC command to the server. (Internal method)
-
-        Parameters:
-            command (str): The IRC command to send.
-            quiet (bool): If True, suppresses output to the console.
-        """
         self.writer.write((command + '\r\n').encode())
         return await self.writer.drain()
 
     async def _capability(self, *args) -> None:
-        """
-        Sends CAP REQ commands to enable additional events. (Internal method)
-
-        Parameters:
-            *args: Variable number of CAP REQ arguments.
-        """
         for arg in args:
             await self._send_command(f'CAP REQ :twitch.tv/{arg}', quiet=True)
 
     async def join_channel(self, channel) -> None:
-        """
-        Joins a Twitch channel.
-
-        Parameters:
-            channel (str): The name of the channel to join.
-        """
         await self._send_command(f'JOIN #{channel}')
 
     async def part_channel(self, channel) -> None:
-        """
-        Parts (leaves) a Twitch channel.
-
-        Parameters:
-            channel (str): The name of the channel to leave.
-        """
         await self._send_command(f'PART #{channel}')
 
     async def setup(self) -> None:
-        """
-        Sets up the bot by establishing connections, enabling capabilities, and joining channels.
-        """
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
         self.id = await get_bot_user_id()
         await self._capability('tags', 'commands', 'membership')
@@ -168,9 +110,6 @@ class Arcane:
         await self._loop_for_messages()
 
     async def event_ready(self) -> None:
-        """
-        Called when the bot is ready to work.
-        """
         if self.ready:
             return
 
@@ -184,21 +123,10 @@ class Arcane:
         print_success('Have a nice day!\n')
 
     def run(self) -> None:
-        """
-        Runs the bot, initiating the setup process.
-        """
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.setup())
 
     async def _shutdown(self, exit: bool = False) -> None:
-        """
-        Stops the bot and disables using it again.
-
-        Parameters
-        ----------
-        exit : Optional[bool]
-            If True, this will close the event loop and raise SystemExit. (default: False)
-        """
         print_error('Goodbey!')
         if self.writer:
             self.writer.close()
@@ -211,7 +139,7 @@ class Arcane:
             gathered.cancel()
             self.loop.run_until_complete(gathered)
             gathered.exception()
-        except:  # Can be ignored
+        except:
             pass
 
         if exit:
@@ -219,28 +147,13 @@ class Arcane:
             sys.exit(0)
 
     async def handle_template_command(self, message: Message, text_command: str, template: str) -> None:
-        """
-        Handles a template command and sends a response to the channel.
-
-        Parameters:
-            message (Message): The Message object representing the incoming message.
-            text_command (str): The text command.
-            template (str): The template for the response.
-        """
         text = template.format(**{'message': message})
         await self.say(message.channel, text)
 
     async def handle_message(self, received_msg: str) -> None:
-        """
-        Handles an incoming IRC message.
-
-        Parameters:
-            received_msg (str): The raw IRC message.
-        """
         if len(received_msg) == 0:
             return
 
-        # message = self.parse_message(received_msg)
         message = Message.parse(received_msg)
         console.print(message)
 
@@ -264,9 +177,6 @@ class Arcane:
         #         self.custom_commands[message.content_command](message)
 
     async def _loop_for_messages(self) -> None:
-        """
-        Main loop for processing incoming IRC messages.
-        """
         try:
             while True:
                 received_msgs = await self.reader.readline()
