@@ -138,16 +138,14 @@ class Arcane:
             return
 
         message = Message.parse(received_msg)
-        console.print(message)
 
-        # if message.irc_command == 'PING':
-        #     """ Tell remote we're still alive """
-        #     self._send_command('PONG :tmi.twitch.tv')
+        if DEBUG and message:
+            console.print(message)
 
-        # if DEBUG:
-        #     channel_name = f'[purple3][@[link=https://twitch.tv/{message.channel}]{message.channel}][/link][/purple3]'
-        #     message_user = f'[link=https://twitch.tv/{message.author}]{message.author}'
-        #     console.print(f'[bold]{channel_name} {message_user}[/]: [white]{message.content}')
+        if message:
+            channel_name = f'[purple3][@[link=https://twitch.tv/{message.channel}]{message.channel}][/link][/purple3]'
+            message_user = f'[{message.color}][link=https://twitch.tv/{message.author}]{message.display_name}[/{message.color}]'
+            console.print(f'[bold][blue][{message.datetime}][/blue] {channel_name} {message_user}[/]: [white]{message.content}')
 
         # if message.irc_command == 'PRIVMSG':
         #     if message.content_command in TEMPLATE_COMMANDS:
