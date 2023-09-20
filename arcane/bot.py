@@ -13,11 +13,6 @@ from arcane.modules.print import print_success, print_error
 
 console = Console()
 
-TEMPLATE_COMMANDS = {
-    '!discord': 'Please join the {message.channel} Discord server, {message.user}',
-    '!so': 'Check out {message.content_args[0]}, they are a nice streamer!',
-}
-
 
 class Arcane:
     __slots__ = (
