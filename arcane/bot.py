@@ -1,5 +1,4 @@
 import asyncio
-import ssl
 import sys
 from typing import Dict, Callable, List, Optional
 
