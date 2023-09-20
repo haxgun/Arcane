@@ -1,13 +1,13 @@
 import asyncio
 import ssl
 import sys
-from typing import Optional, Dict, Callable, List
+from typing import Dict, Callable, List, Optional
 
 from rich.console import Console
 
 from arcane.models import Channel
 from arcane.modules.twitchapi import get_bot_user_id
-from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID
+from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 from arcane.modules.dataclasses import Message
 from arcane.modules.print import print_success, print_error
 
@@ -26,6 +26,7 @@ class Arcane:
         'username',
         'client_id',
         'id',
+        'prefix',
         'channels',
         'custom_commands',
     )
@@ -34,9 +35,13 @@ class Arcane:
         self.ready: bool = False
         self.host: str = 'irc.chat.twitch.tv'
         self.port: int = 6697
+        self.reader: Optional[asyncio.StreamReader] = None
+        self.writer: Optional[asyncio.StreamWriter] = None
         self.token: str = ACCESS_TOKEN
         self.username: str = USERNAME
         self.client_id: str = CLIENT_ID
+        self.id: Optional[int] = None
+        self.prefix: str = PREFIX
         self.channels: List[str] = Channel.get_all_channel_names()
         self.custom_commands: Dict[str, Callable[[Message], None]] = {}
 
