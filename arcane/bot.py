@@ -20,22 +20,6 @@ TEMPLATE_COMMANDS = {
 
 
 class Arcane:
-    """
-    The main bot class for Arcane.
-
-    Attributes:
-        ready (bool): Indicates whether the bot is ready to work.
-        irc (ssl.SSLSocket): SSL-wrapped socket for IRC communication.
-        irc_server (str): The IRC server to connect to.
-        irc_port (int): The port for IRC communication.
-        loop (asyncio.AbstractEventLoop): The asyncio event loop for handling asynchronous operations.
-        token (str): Twitch OAuth token for authentication.
-        username (str): Twitch username of the bot.
-        client_id (str): Twitch client ID.
-        channels (List[str]): List of Twitch channel names to connect to.
-        custom_commands (Dict[str, Callable[[Message], None]]): Custom bot commands.
-    """
-
     __slots__ = (
         'ready',
         'host',
