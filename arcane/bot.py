@@ -161,10 +161,14 @@ class Arcane:
         try:
             while True:
                 received_msgs = await self.reader.readline()
-                mgs = received_msgs.decode()
-                if not mgs:
+                msgs = received_msgs.decode()
+                if not msgs:
                     continue
-                for msg in mgs.split('\r\n'):
+                for msg in msgs.split('\r\n'):
+                    if msg.startswith('PING '):
+                        _, _, rest = msg.partition(' ')
+                        await self._send_command(f'PONG {rest.rstrip()}', quiet=True)
+                        continue
                     await self.handle_message(msg)
         except KeyboardInterrupt:
             await self._shutdown(exit=True)
