@@ -1,9 +1,8 @@
-from arcane.modules.decorators import permission
+from arcane.modules.command_line_arguments import bot
 from arcane.modules.twitchapi import get_stream_title, get_game_id, set_stream_title, change_stream_game, get_game_name
 
 
-@command(name='title')
-@permission('moderator', 'broadcaster')
+@bot.command(name='title', permissions=['moderador', 'broadcaster'])
 async def cmd_title(self, ctx, *args: str) -> None:
     channel_name = ctx.channel.name
     new_title = ' '.join(args)
@@ -21,8 +20,8 @@ async def cmd_title(self, ctx, *args: str) -> None:
     channel_title = channel_info.title
     await ctx.reply(channel_title)
 
-@command(name='game')
-@permission('moderator', 'broadcaster')
+
+@bot.command(name='game', permissions=['moderador', 'broadcaster'])
 async def cmd_game(self, ctx, *args) -> None:
     new_game = ' '.join(args)
     channel_name = ctx.channel.name
@@ -31,8 +30,8 @@ async def cmd_game(self, ctx, *args) -> None:
 
     if new_game_id:
         if await change_stream_game(channel_name, new_game_id):
-            await ctx.send(f"{new_game_name} ✅")
+            await ctx.send(f'{new_game_name} ✅')
         else:
-            await ctx.send("Failed ❌")
+            await ctx.send('Failed ❌')
     else:
-        await ctx.send("Game not found.")
+        await ctx.send('Game not found.')

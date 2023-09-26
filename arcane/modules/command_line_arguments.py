@@ -1,38 +1,36 @@
-from arcane.bot import Arcane
+from arcane.bot import bot
 from arcane.models import Channel
-from arcane.modules.print import print_success, print_error, input_answer
+from arcane.modules import print
 from arcane.modules.twitchapi import existing_channel_twitch
-
-bot = Arcane()
 
 
 def add_channel() -> None:
-    channel_name = str(input_answer('Which channel do you want to add?'))
+    channel_name = str(print.input_answer('Which channel do you want to add?'))
 
     if not existing_channel_twitch(channel_name):
-        print_error('There is no such user!')
+        print.error('There is no such user!')
         return
 
     try:
         existing_channel_db = Channel.get(Channel.name == channel_name)
-        print_error(f'User @{channel_name} already exists.')
+        print.error(f'User @{channel_name} already exists.')
     except Exception:
         channel = Channel.create(name=channel_name)
-        print_success(f'User @{channel_name} added.')
+        print.success(f'User @{channel_name} added.')
 
 
 def remove_channel() -> None:
-    channel_name = str(input_answer('Which channel do you want to add?'))
+    channel_name = str(print.input_answer('Which channel do you want to add?'))
 
     existing_channel = Channel.get(Channel.name == channel_name)
 
     if existing_channel:
         existing_channel.delete_instance()
         existing_channel.save()
-        print_success(f'User @{channel_name} has been removed from the database.')
+        print.success(f'User @{channel_name} has been removed from the database.')
     else:
-        print_error(f'User @{channel_name} is not in the database.')
+        print.error(f'User @{channel_name} is not in the database.')
 
 
 def run_bot() -> None:
-    raise SystemExit(bot.run())
+    bot.run()

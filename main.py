@@ -3,7 +3,7 @@
 
 import argparse
 
-from arcane.modules.print import print_error
+from arcane.modules import print
 from arcane.modules.command_line_arguments import add_channel, run_bot, remove_channel
 
 
@@ -35,7 +35,7 @@ def main():
         selected_function = command_functions[args.command]
         selected_function()
     except KeyError:
-        print_error('No argument selected')
+        print.error('No argument selected')
 
 
 if __name__ == '__main__':

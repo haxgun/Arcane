@@ -111,7 +111,7 @@ async def get_game_id(new_game: str) -> Optional[str]:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                return data["data"][0]["id"]
+                return data['data'][0]['id']
             return
 
 
@@ -121,7 +121,7 @@ async def get_game_name(new_game: str) -> Optional[str]:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                return data["data"][0]["name"]
+                return data['data'][0]['name']
             return
 
 
@@ -153,7 +153,7 @@ async def api_latency() -> Optional[int]:
     start_time = time.time()
 
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://gql.twitch.tv/gql', timeout=5) as response:
+        async with session.get('https://gql.twitch.tv/gql', timeout=5):
             end_time = time.time()
             latency = round((end_time - start_time) * 1000)
             return latency
