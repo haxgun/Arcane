@@ -132,6 +132,7 @@ async def get_game_id(new_game: str) -> Optional[str]:
 
 
 async def get_game_name(new_game: str) -> Optional[str]:
+async def get_game(new_game: str) -> tuple[str, str] | None:
     url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
