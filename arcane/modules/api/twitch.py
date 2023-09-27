@@ -14,6 +14,10 @@ access_token = settings.ACCESS_TOKEN
 headers = {
     'Client-ID': client_id,
     'Authorization': f'Bearer {access_token}'
+
+headers_broadcaster = {
+    'Client-ID': settings.BROADCASTER_CLIENT_ID,
+    'Authorization': f'Bearer {settings.BROADCASTER_TOKEN}'
 }
 
 
@@ -143,7 +147,7 @@ async def change_stream_game(channel_name: str, game_id: str) -> bool:
         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
         payload = {'game_id': game_id}
         async with aiohttp.ClientSession() as session:
-            async with session.patch(url, headers=headers, json=payload) as response:
+            async with session.patch(url, headers=headers_broadcaster, json=payload) as response:
                 if response.status == 204:
                     return True
     return False
@@ -155,7 +159,7 @@ async def set_stream_title(channel_name: str, *, title: str) -> bool:
         url = f'https://api.twitch.tv/helix/channels?broadcaster_id={channel_id}'
         payload = {'title': title}
         async with aiohttp.ClientSession() as session:
-            async with session.patch(url, headers=headers, json=payload) as response:
+            async with session.patch(url, headers=headers_broadcaster, json=payload) as response:
                 if response.status == 204:
                     return True
     return False
