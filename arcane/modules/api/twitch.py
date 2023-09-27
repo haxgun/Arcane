@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from typing import Optional
+from fuzzywuzzy import fuzz
 
 import aiohttp
 import pytz
@@ -121,24 +121,28 @@ async def get_followers_count(channel_name: str) -> list | None:
             return
 
 
-async def get_game_id(new_game: str) -> Optional[str]:
-    url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return data['data'][0]['id']
-            return
+def find_most_similar_game(games_data, game_to_find):
+    max_similarity = -1
+    most_similar_game = None
+
+    for game_data in games_data:
+        game_name = game_data['name']
+        similarity = fuzz.ratio(game_to_find.lower(), game_name.lower())
+
+        if similarity > max_similarity:
+            max_similarity = similarity
+            most_similar_game = game_data
+
+    return most_similar_game
 
 
-async def get_game_name(new_game: str) -> Optional[str]:
 async def get_game(new_game: str) -> tuple[str, str] | None:
     url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                return data['data'][0]['name']
+                return find_most_similar_game(data['data'], new_game)
             return
 
 

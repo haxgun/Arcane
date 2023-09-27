@@ -13,6 +13,8 @@ pytz = "*"
 peewee = "*"
 asyncio = "*"
 aiohttp = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 
