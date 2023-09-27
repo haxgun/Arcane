@@ -6,7 +6,7 @@ from arcane.modules.custom_commands import starts_with_emoji
 from arcane.modules.dataclasses import Message
 
 
-async def send_usage(msg: Message) -> None:
+async def send_usage_for_custom_commands(msg: Message) -> None:
     main_command = msg.content.split()[0]
     sub_command = msg.content.split()[1]
     await msg.reply(f'Usage: {main_command} {sub_command} <command> <response>')
@@ -110,7 +110,7 @@ async def cmd_aliases(msg: Message, subcommand: str = None) -> None:
 @cmd_aliases.subcommand(name='add', aliases=['a'], permissions=['moderator', 'broadcaster'])
 async def cmd_add_alias(msg: Message, command_name: str = None, alias_name: str = None) -> None:
     if not command_name or not alias_name:
-        await send_usage(msg)
+        await send_usage_for_custom_commands(msg)
         return
 
     if starts_with_emoji(command_name):
@@ -132,7 +132,7 @@ async def cmd_add_alias(msg: Message, command_name: str = None, alias_name: str 
 @cmd_aliases.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'])
 async def cmd_remove_alias(msg: Message, alias_name: str = None) -> None:
     if not alias_name:
-        await send_usage(msg)
+        await send_usage_for_custom_commands(msg)
         return
 
     channel = Channel.get(name=msg.channel)
@@ -147,7 +147,7 @@ async def cmd_remove_alias(msg: Message, alias_name: str = None) -> None:
 @cmd_aliases.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'])
 async def cmd_edit_alias(msg: Message, alias_name: str = None, new_name: str = None) -> None:
     if not alias_name or not new_name:
-        await send_usage(msg)
+        await send_usage_for_custom_commands(msg)
         return
     try:
         channel = Channel.get(Channel.name == msg.channel)
