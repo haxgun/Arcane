@@ -11,9 +11,7 @@ if dotenv_file.is_file():
     load_dotenv(dotenv_file)
 
 # Twitch Bot Settings
-USERNAME = environ['USERNAME']
 ACCESS_TOKEN = environ['ACCESS_TOKEN']
-REFRESH_TOKEN = environ['REFRESH_TOKEN']
 CLIENT_ID = environ['CLIENT_ID']
 
 # Bot settings

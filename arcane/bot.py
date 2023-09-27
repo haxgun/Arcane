@@ -9,8 +9,8 @@ from typing import Callable
 from rich.console import Console
 
 from arcane.models import Channel
-from arcane.modules.api.twitch import get_bot_user_id
-from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
+from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
+from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 from arcane.modules.dataclasses import Message, Command
 from arcane.modules import print
 
@@ -27,7 +27,7 @@ class Arcane:
         self.reader: asyncio.StreamReader | None = None
         self.writer: asyncio.StreamWriter | None = None
         self.token: str = ACCESS_TOKEN
-        self.username: str = USERNAME
+        self.username: str | None = None
         self.client_id: str = CLIENT_ID
         self.id: int | None = None
         self.prefix: str = PREFIX
@@ -73,6 +73,7 @@ class Arcane:
         await self._send_command(f'PRIVMSG #{channel} :{message}')
 
     async def _nick(self) -> None:
+        self.username = await get_bot_username()
         await self._send_command(f'NICK {self.username}')
 
     async def _pass(self) -> None:

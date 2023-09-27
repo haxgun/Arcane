@@ -17,6 +17,18 @@ headers = {
 }
 
 
+async def get_bot_username() -> str:
+    url = 'https://api.twitch.tv/helix/users'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url, headers=headers) as response:
+            try:
+                data = await response.json()
+                if 'data' in data and len(data['data']) > 0:
+                    return data['data'][0]['login']
+            except Exception as e:
+                print.error(f'Error: {e}')
+
+
 async def get_bot_user_id() -> int:
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.twitch.tv/helix/users', headers=headers) as response:
