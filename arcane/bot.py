@@ -36,7 +36,7 @@ class Arcane:
         self.aliases: dict = {}
         self.custom_commands: dict[str, Callable[[Message], None]] = {}
 
-    def command(*args, **kwargs):
+    def command(*args, **kwargs) -> Callable[[Message], None]:
         return Command(*args, **kwargs)
 
     async def reply(self, parent: uuid, channel: str, message: str) -> None:
@@ -87,10 +87,10 @@ class Arcane:
         for arg in args:
             await self._send_command(f'CAP REQ :twitch.tv/{arg}')
 
-    async def join_channel(self, channel) -> None:
+    async def join_channel(self, channel: str) -> None:
         await self._send_command(f'JOIN #{channel}')
 
-    async def part_channel(self, channel) -> None:
+    async def part_channel(self, channel: str) -> None:
         await self._send_command(f'PART #{channel}')
 
     @staticmethod
