@@ -13,3 +13,14 @@ async def cmd_rank(msg: Message) -> None:
         await msg.reply(info)
     else:
         await msg.reply('ERROR')
+
+
+@bot.command(name='lastgame', aliases=['lg'])
+async def cmd_valorant_lg(msg: Message) -> None:
+    channel = Channel.get(Channel.name == msg.channel)
+    valorant_name = channel.valorant
+    info = await get_stats_last_game(valorant_name)
+    if info:
+        await msg.reply(info)
+    else:
+        await msg.reply('ERROR')
