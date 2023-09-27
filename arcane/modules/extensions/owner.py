@@ -1,6 +1,6 @@
 from peewee import IntegrityError, DoesNotExist
 
-from arcane.bot import bot
+from arcane import bot
 from arcane.models import Channel
 from arcane.modules.api.twitch import api_latency, existing_channel_twitch
 
