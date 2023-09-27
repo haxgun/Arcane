@@ -22,6 +22,6 @@ python-levenshtein = "*"
 python_version = "3.11"
 
 [scripts]
-bot = "python main.py runbot"
+bot = "python main.py run"
 addchannel = "python main.py addchannel"
 removechannel = "python main.py removechannel"

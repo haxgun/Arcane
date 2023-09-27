@@ -4,7 +4,7 @@
 import argparse
 
 from arcane.modules import print
-from arcane.modules.command_line_arguments import add_channel, run_bot, remove_channel
+from arcane.modules.cla import add_channel, run_bot, remove_channel
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command', help='Specify the command to execute')
 
     addchannel_parser = subparsers.add_parser('addchannel', help=command_descriptions['addchannel'])
-    runbot_parser = subparsers.add_parser('runbot', help=command_descriptions['runbot'])
+    runbot_parser = subparsers.add_parser('run', help=command_descriptions['runbot'])
     removechannel_parser = subparsers.add_parser('removechannel', help=command_descriptions['removechannel'])
 
     args = parser.parse_args()
