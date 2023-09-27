@@ -1,11 +1,11 @@
 import time
 from datetime import datetime
-from fuzzywuzzy import fuzz
 
 import aiohttp
 import pytz
 import requests
 from dateutil.parser import parse as parse_datetime
+from fuzzywuzzy import fuzz
 
 from arcane import settings
 from arcane.modules import print
