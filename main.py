@@ -11,13 +11,13 @@ def main():
     """Run administrative tasks."""
     command_functions = {
         'addchannel': add_channel,
-        'runbot': run_bot,
+        'run': run_bot,
         'removechannel': remove_channel
     }
 
     command_descriptions = {
         'addchannel': 'Add a channel to the bot',
-        'runbot': 'Run the bot',
+        'run': 'Run the bot',
         'removechannel': 'Remove a channel from the bot'
     }
 
@@ -26,7 +26,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command', help='Specify the command to execute')
 
     addchannel_parser = subparsers.add_parser('addchannel', help=command_descriptions['addchannel'])
-    runbot_parser = subparsers.add_parser('run', help=command_descriptions['runbot'])
+    runbot_parser = subparsers.add_parser('run', help=command_descriptions['run'])
     removechannel_parser = subparsers.add_parser('removechannel', help=command_descriptions['removechannel'])
 
     args = parser.parse_args()
