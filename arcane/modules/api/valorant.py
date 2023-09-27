@@ -46,6 +46,11 @@ async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
         rank = data['data']['currenttierpatched']
         rr = data['data']['ranking_in_tier']
         elo = data['data']['elo']
-        return f'{rank} - {rr}RR - {elo} elo'
+
+        mmr_change = data['data']['mmr_change_to_last_game']
+        if mmr_change > 0:
+            mmr_change = '+' + str(mmr_change)
+
+        return f'{rank} - {rr}RR - {elo} elo ({mmr_change})'
     else:
         return data

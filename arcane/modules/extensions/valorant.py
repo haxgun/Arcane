@@ -1,7 +1,7 @@
 from arcane import bot
 from arcane.models import Channel
 from arcane.modules.dataclasses import Message
-from arcane.modules.valorant_api import get_rank_with_rr_and_elo
+from arcane.modules.api.valorant import get_rank_with_rr_and_elo, get_stats_last_game
 
 
 @bot.command(name='rank')
