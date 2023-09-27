@@ -1,8 +1,8 @@
 import time
 
-from peewee import DoesNotExist
-from twitchio.ext import commands
 import emoji
+from peewee import DoesNotExist
+
 from arcane.models import Channel, Command, Alias
 
 cooldowns = {}
@@ -12,7 +12,7 @@ def starts_with_emoji(text) -> bool:
     return emoji.demojize(text) != text
 
 
-async def find_entity(ctx: commands.Context, EntityModel) -> bool:
+async def find_entity(ctx, EntityModel) -> bool:
     entity_name = ctx.message.content.split()[0][1:]
 
     if starts_with_emoji(entity_name):
@@ -26,14 +26,14 @@ async def find_entity(ctx: commands.Context, EntityModel) -> bool:
         return False
 
 
-async def custom_command_response(ctx: commands.Context) -> str:
+async def custom_command_response(ctx) -> str:
     command_name = ctx.message.content.split()[0][1:]
     channel = Channel.get(Channel.name == ctx.channel.name)
     command = Command.get(Command.name == command_name, Command.channel == channel)
     return command.response
 
 
-async def alias_response(ctx: commands.Context) -> str:
+async def alias_response(ctx) -> str:
     alias_name = ctx.message.content.split()[0][1:]
     channel = Channel.get(Channel.name == ctx.channel.name)
     alias = Alias.get(Alias.name == alias_name, Alias.channel == channel)
@@ -57,7 +57,7 @@ async def update_command_cooldown(user_id: str, command: str) -> None:
     cooldowns[key] = time.time()
 
 
-async def handle_custom_commands(context: commands.Context) -> None:
+async def handle_custom_commands(context) -> None:
     entity = None
     response = None
     count = 1

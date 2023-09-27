@@ -1,12 +1,11 @@
 # ⚗️ Arcane
 [![GitHub License](https://img.shields.io/github/license/haxgun/Arcane)](https://github.com/haxgun/Arcane/blob/main/LICENSE)
 ![Python Version](https://img.shields.io/badge/Python-3.11.4-informational.svg)
-![TwitchIO Version](https://img.shields.io/badge/TwitchIO-2.6.0-informational.svg)
 
 ## ⚡️ Installation
 **Required components:**
 - Twitch Account for Bot
-- Python 3.7+
+- Python 3.10+
 - Pipenv or venv
 - VSCode or Pycharm
 
@@ -25,9 +24,10 @@ To set up the Arcane, follow these steps:
 
 ## 🗃️ Structure
 * `/arcane`: main folder of the bot
-    * `/cogs`: cogs folder
+    * `/models`: models for Database
+    * `/modules`: modules for bot
+        * `/commands`: commands folder
     * `/settings`: configuration settings of the bot
-    * `/models`: modules for Database
     * `bot.py`: bot core
 * `main.py`: main file for launch bot
 

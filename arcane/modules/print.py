@@ -4,19 +4,19 @@ from rich.prompt import Prompt
 console = Console()
 
 
-def print_success(message: str) -> None:
+def success(message: str) -> None:
     console.print(f'[bold green][+] [white]{message}[/]')
 
 
-def print_error(message: str) -> None:
+def error(message: str) -> None:
     console.print(f'[bold red][!] [white]{message}[/]')
 
 
-def print_loading(message: str) -> None:
+def loading(message: str) -> None:
     console.print(f'[bold yellow][\] [white]{message}[/]')
 
 
-def print_info(message: str) -> None:
+def info(message: str) -> None:
     console.print(f'[bold green][?] [white]{message}[/]')
 
 

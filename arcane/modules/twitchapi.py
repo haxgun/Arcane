@@ -1,12 +1,12 @@
 import time
 from datetime import datetime
-
-import pytz
-from dateutil.parser import parse as parse_datetime
 from typing import Optional
 
 import aiohttp
+import pytz
 import requests
+from dateutil.parser import parse as parse_datetime
+
 from arcane import settings
 
 client_id = settings.CLIENT_ID
@@ -15,6 +15,14 @@ headers = {
     'Client-ID': client_id,
     'Authorization': f'Bearer {access_token}'
 }
+
+
+async def get_bot_user_id() -> int:
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://api.twitch.tv/helix/users', headers=headers) as response:
+            data = await response.json()
+            if 'data' in data and len(data['data']) > 0:
+                return data['data'][0]['id']
 
 
 def existing_channel_twitch(channel_name: str) -> bool:
@@ -103,7 +111,7 @@ async def get_game_id(new_game: str) -> Optional[str]:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                return data["data"][0]["id"]
+                return data['data'][0]['id']
             return
 
 
@@ -113,7 +121,7 @@ async def get_game_name(new_game: str) -> Optional[str]:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                return data["data"][0]["name"]
+                return data['data'][0]['name']
             return
 
 
@@ -145,7 +153,7 @@ async def api_latency() -> Optional[int]:
     start_time = time.time()
 
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://gql.twitch.tv/gql', timeout=5) as response:
+        async with session.get('https://gql.twitch.tv/gql', timeout=5):
             end_time = time.time()
             latency = round((end_time - start_time) * 1000)
             return latency
