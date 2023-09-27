@@ -12,6 +12,14 @@ async def send_usage(msg: Message) -> None:
     await msg.reply(f'Usage: {main_command} {sub_command} <command> <response>')
 
 
+@bot.command(name='me', permissions=['moderator', 'broadcaster'])
+async def cmd_me(msg: Message, response: str = None) -> None:
+    if not response:
+        await msg.send('Usage: !me <response>')
+        return
+    await msg.me(response)
+
+
 @bot.command(name='spam', aliases=['sm', 'спам'], permissions=['moderator', 'broadcaster'])
 async def cmd_spam(msg: Message, count: int = None, response: str = None) -> None:
     if not count or not response:

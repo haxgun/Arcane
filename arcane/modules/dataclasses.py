@@ -130,6 +130,9 @@ class Message(NamedTuple):
     async def reply(self, message: str) -> None:
         await self.bot.reply(self.id, self.channel, message)
 
+    async def me(self, message: str) -> None:
+        await self.bot.me(self.channel, message)
+
 
 class Command:
 

@@ -58,6 +58,15 @@ class Arcane:
 
         await self._send_privmsg(channel, message)
 
+    async def me(self, channel: str, message: str) -> None:
+        if len(message) > 500:
+            raise Exception(
+                'The maximum amount of characters in one message is 500,'
+                f' you tried to send {len(message)} characters')
+
+        message = message.replace('\n', ' ')
+        await self._send_command(f'PRIVMSG #{channel} :.me {message}')
+
     async def _send_privmsg(self, channel: str, message: str) -> None:
         message = message.replace('\n', ' ')
         await self._send_command(f'PRIVMSG #{channel} :{message}')
