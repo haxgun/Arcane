@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import sys
+import traceback
 import uuid
 from pathlib import Path
 from typing import Callable
@@ -172,7 +173,8 @@ class Arcane:
 
     @staticmethod
     async def parse_error(e: Exception) -> None:
-        print.error(f'Ignoring exception in traceback:\n{e}')
+        traceback_str = ''.join(traceback.format_tb(e.__traceback__))
+        print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
     async def _loop_for_messages(self) -> None:
         while True:
