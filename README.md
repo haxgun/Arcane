@@ -1,6 +1,6 @@
 # ⚗️ Arcane
 [![GitHub License](https://img.shields.io/github/license/haxgun/Arcane)](https://github.com/haxgun/Arcane/blob/main/LICENSE)
-![Python Version](https://img.shields.io/badge/Python-3.11.4-informational.svg)
+![Python Version](https://img.shields.io/badge/Python-3.10+-informational.svg)
 
 ## ⚡️ Installation
 **Required components:**
@@ -26,7 +26,8 @@ To set up the Arcane, follow these steps:
 * `/arcane`: main folder of the bot
     * `/models`: models for Database
     * `/modules`: modules for bot
-        * `/commands`: commands folder
+        * `/api`: API folder 
+        * `/extensions`: extensions folder
     * `/settings`: configuration settings of the bot
     * `bot.py`: bot core
 * `main.py`: main file for launch bot
