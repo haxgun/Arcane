@@ -5,9 +5,10 @@ from arcane.modules.api.valorant import get_rank_with_rr_and_elo, get_stats_last
 
 
 @bot.command(name='rank')
-async def cmd_rank(msg: Message) -> None:
-    channel = Channel.get(Channel.name == msg.channel)
-    valorant_name = channel.valorant
+async def cmd_valorant_rank(msg: Message, valorant_name: str = None) -> None:
+    if not valorant_name or '#' not in valorant_name:
+        channel = Channel.get(Channel.name == msg.channel)
+        valorant_name = channel.valorant
     info = await get_rank_with_rr_and_elo(valorant_name)
     if info:
         await msg.reply(info)
