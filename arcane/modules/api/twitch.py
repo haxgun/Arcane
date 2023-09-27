@@ -8,12 +8,12 @@ import requests
 from dateutil.parser import parse as parse_datetime
 
 from arcane import settings
+from arcane.modules import print
 
-client_id = settings.CLIENT_ID
-access_token = settings.ACCESS_TOKEN
 headers = {
-    'Client-ID': client_id,
-    'Authorization': f'Bearer {access_token}'
+    'Client-ID': settings.CLIENT_ID,
+    'Authorization': f'Bearer {settings.ACCESS_TOKEN}'
+}
 
 headers_broadcaster = {
     'Client-ID': settings.BROADCASTER_CLIENT_ID,
