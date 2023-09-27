@@ -94,15 +94,15 @@ class Arcane:
         await self._send_command(f'PART #{channel}')
 
     @staticmethod
-    async def load_plugin() -> None:
-        extensions = [p.stem for p in Path('./arcane/modules/extensions/').glob('*.py')]
-        with console.status('[bold] Installation of extensions begins...'):
-            for extension in extensions:
+    async def _load_extensions() -> None:
+        extension_paths = [p.stem for p in Path('./arcane/modules/extensions/').glob('*.py')]
+        with console.status('[bold] Loading extensions...'):
+            for extension in extension_paths:
                 try:
                     importlib.import_module(f'arcane.modules.extensions.{extension}')
-                    print.success(f'\'{extension}\' extension loaded.')
+                    print.success(f'\'{extension}\' loaded.')
                 except Exception as e:
-                    print.error(f'\'{extension}\' extension unloaded.')
+                    print.error(f'\'{extension}\' failed to load.')
                     print.error(f'Error: {e}')
 
     async def setup(self) -> None:
@@ -117,7 +117,7 @@ class Arcane:
                 await self.join_channel(channel)
 
         await self.event_ready()
-        await self.load_plugin()
+        await self._load_extensions()
         await self._loop_for_messages()
 
     async def event_ready(self) -> None:
