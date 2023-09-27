@@ -33,6 +33,7 @@ class Arcane:
         self.prefix: str = PREFIX
         self.channels: list[str] = Channel.get_all_channel_names()
         self.commands: dict = {}
+        self.aliases: dict = {}
         self.custom_commands: dict[str, Callable[[Message], None]] = {}
 
     def command(*args, **kwargs):
@@ -178,6 +179,9 @@ class Arcane:
             if message.content.startswith(self.prefix):
                 command = message.content.split()[0][len(self.prefix):]
                 if command in self.commands:
+                    await self.commands[command].execute_command(message)
+                elif command in self.aliases:
+                    command = self.aliases[command]
                     await self.commands[command].execute_command(message)
 
     @staticmethod

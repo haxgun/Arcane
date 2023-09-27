@@ -152,7 +152,7 @@ class Command:
         self.bot = bot
         bot.commands[name] = self
         for alias in self.aliases:
-            bot.commands[alias] = self
+            bot.aliases[alias] = name
 
     def subcommand(self, *args, **kwargs):
         return SubCommand(self, *args, **kwargs)
