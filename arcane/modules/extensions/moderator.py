@@ -150,3 +150,19 @@ async def cmd_edit_alias(msg: Message, alias_name: str = None, new_name: str = N
     except DoesNotExist as e:
         print(e)
         await msg.reply('❌')
+
+
+@bot.command(name='settings', aliases=['set'], permissions=['moderator', 'broadcaster'])
+async def cmd_settings(msg: Message, subcommand: str = None) -> None:
+    pass
+
+
+@cmd_settings.subcommand(name='valorant', aliases=['vlr'], permissions=['moderator', 'broadcaster'])
+async def cmd_settings_valorant(msg: Message, name_with_tag: str) -> None:
+    if '#' in name_with_tag:
+        channel = Channel.get(Channel.name == msg.channel)
+        channel.valorant = name_with_tag
+        channel.save()
+        await msg.reply('✅')
+    else:
+        await msg.reply('❌')
