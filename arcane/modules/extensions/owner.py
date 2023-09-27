@@ -1,11 +1,8 @@
-from asyncio import gather
-from typing import Any
-
 from peewee import IntegrityError, DoesNotExist
 
 from arcane.bot import bot
 from arcane.models import Channel
-from arcane.modules.twitchapi import api_latency, existing_channel_twitch
+from arcane.modules.api.twitch import api_latency, existing_channel_twitch
 
 
 @bot.command(name='channels', aliases=['ch'], permissions=['owner'])

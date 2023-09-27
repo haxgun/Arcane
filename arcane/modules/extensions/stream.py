@@ -1,5 +1,6 @@
-from arcane.modules.command_line_arguments import bot
-from arcane.modules.twitchapi import get_stream_title, get_game_id, set_stream_title, change_stream_game, get_game_name
+from arcane import bot
+from arcane.modules.dataclasses import Message
+from arcane.modules.api.twitch import get_stream_title, set_stream_title, change_stream_game, get_game
 
 
 @bot.command(name='title', permissions=['moderador', 'broadcaster'])

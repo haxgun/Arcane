@@ -1,7 +1,7 @@
 from arcane.bot import bot
 from arcane.models import Channel
 from arcane.modules import print
-from arcane.modules.twitchapi import existing_channel_twitch
+from arcane.modules.api.twitch import existing_channel_twitch
 
 
 def add_channel() -> None:

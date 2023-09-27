@@ -5,7 +5,7 @@ import pytz
 from dateutil.relativedelta import relativedelta
 
 from arcane.bot import bot
-from arcane.modules.twitchapi import get_user_creation, get_stream_started_at, get_followers
+from arcane.modules.api.twitch import get_user_creation, get_stream_started_at, get_followers
 
 
 @bot.command(name='8ball', aliases=['8b'])

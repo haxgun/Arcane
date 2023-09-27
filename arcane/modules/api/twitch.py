@@ -33,7 +33,7 @@ def existing_channel_twitch(channel_name: str) -> bool:
     return False
 
 
-async def get_stream(channel_name: str) -> Optional[list]:
+async def get_stream(channel_name: str) -> list | None:
     url = f'https://api.twitch.tv/helix/streams?user_login={channel_name}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
@@ -43,7 +43,7 @@ async def get_stream(channel_name: str) -> Optional[list]:
             return
 
 
-async def get_user(channel_name: str) -> Optional[dict]:
+async def get_user(channel_name: str) -> dict | None:
     url = f'https://api.twitch.tv/helix/users?login={channel_name}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
@@ -53,14 +53,14 @@ async def get_user(channel_name: str) -> Optional[dict]:
             return
 
 
-async def get_broadcaster_id(channel_name: str) -> Optional[str]:
+async def get_broadcaster_id(channel_name: str) -> str | None:
     data = await get_user(channel_name)
     if data:
         return data['data'][0]['id']
     return
 
 
-async def get_user_creation(channel_name: str) -> Optional[datetime]:
+async def get_user_creation(channel_name: str) -> datetime | None:
     data = await get_user(channel_name)
     if data:
         created_at_str = data['data'][0]['created_at']
@@ -68,14 +68,14 @@ async def get_user_creation(channel_name: str) -> Optional[datetime]:
     return
 
 
-async def get_stream_title(channel_name: str) -> Optional[str]:
+async def get_stream_title(channel_name: str) -> str | None:
     data = await get_stream(channel_name)
     if data:
         return data[0]['title']
     return
 
 
-async def get_stream_started_at(channel_name: str) -> Optional[datetime]:
+async def get_stream_started_at(channel_name: str) -> datetime | None:
     data = await get_stream(channel_name)
     if data:
         started_at_str = data[0]['started_at']
@@ -83,7 +83,7 @@ async def get_stream_started_at(channel_name: str) -> Optional[datetime]:
     return
 
 
-async def get_followers(channel_name: str) -> Optional[list]:
+async def get_followers(channel_name: str) -> list | None:
     channel_id = await get_broadcaster_id(channel_name)
     url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
     async with aiohttp.ClientSession() as session:
@@ -94,7 +94,7 @@ async def get_followers(channel_name: str) -> Optional[list]:
             return
 
 
-async def get_followers_count(channel_name: str) -> Optional[list]:
+async def get_followers_count(channel_name: str) -> list | None:
     channel_id = await get_broadcaster_id(channel_name)
     url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
     async with aiohttp.ClientSession() as session:
@@ -149,7 +149,7 @@ async def set_stream_title(channel_name: str, *, title: str) -> bool:
     return False
 
 
-async def api_latency() -> Optional[int]:
+async def api_latency() -> int | None:
     start_time = time.time()
 
     async with aiohttp.ClientSession() as session:

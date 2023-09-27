@@ -9,7 +9,7 @@ from typing import Callable
 from rich.console import Console
 
 from arcane.models import Channel
-from arcane.modules.twitchapi import get_bot_user_id
+from arcane.modules.api.twitch import get_bot_user_id
 from arcane.settings import USERNAME, DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 from arcane.modules.dataclasses import Message, Command
 from arcane.modules import print
