@@ -191,16 +191,16 @@ class Arcane:
         print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
     async def _loop_for_messages(self) -> None:
-        while True:
-            try:
+        try:
+            while True:
                 received_msgs = await self.reader.readline()
                 msgs = received_msgs.decode()
                 if not msgs:
                     continue
                 for msg in msgs.split('\r\n'):
                     await self.handle_message(msg)
-            except Exception as e:
-                await self.parse_error(e)
+        except Exception as e:
+            await self.parse_error(e)
 
 
 bot = Arcane()
