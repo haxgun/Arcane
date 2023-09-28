@@ -41,6 +41,7 @@ async def get_mmr_details(name_with_tag: str) -> dict | str:
 
 
 async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
+    name, tag = name_with_tag.split('#')
     data = await get_mmr_details(name_with_tag)
     if isinstance(data, dict):
         rank = data['data']['currenttierpatched']
@@ -51,7 +52,7 @@ async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
         if mmr_change > 0:
             mmr_change = '+' + str(mmr_change)
 
-        return f'{rank} - {rr}RR - {elo} elo ({mmr_change})'
+        return f'{rank} - {rr}RR - {elo} elo ({mmr_change}) - https://tracker.gg/valorant/profile/riot/{name}%23{tag}'
     else:
         return data
 
@@ -66,14 +67,16 @@ async def get_matches(name_with_tag: str, mode: str = 'competitive', size: int =
 async def get_stats_last_game(name_with_tag: str) -> dict | str:
     data = await get_matches(name_with_tag)
     game_data = data['data'][0]
+
     stats = game_data['stats']
     teams = game_data['teams']
+    map_name = game_data['meta']['map']['name']
+    match_id = game_data['meta']['id']
+
     character = stats['character']['name']
     kills = stats['kills']
     deaths = stats['deaths']
     assists = stats['assists']
-
-    map_name = game_data['meta']['map']['name']
 
     shots = stats['shots']
     head_shots = shots.get('head', 0)
@@ -94,4 +97,5 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
     else:
         win_status = 'Drew'
 
-    return f'{map_name} - {win_status} - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}%'
+    return (f'{map_name} - {win_status} - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
+            f'https://tracker.gg/valorant/match/{match_id}')
