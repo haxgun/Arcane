@@ -29,7 +29,7 @@ def _gen_color(name: str) -> tuple[int, int, int]:
     return r, g, b
 
 
-class Author(NamedTuple):
+class User(NamedTuple):
     id: str
     name: str
     display_name: str
@@ -70,7 +70,7 @@ class Message(NamedTuple):
     bot: Any
     id: str
     datetime: str
-    author: Author
+    author: User
     channel: str
     content: str
     info: dict[str, str]
@@ -110,7 +110,7 @@ class Message(NamedTuple):
                 bot=bot,
                 id=info['id'],
                 datetime=datetime,
-                author=Author(
+                author=User(
                     id=info['user-id'],
                     name=match['author'],
                     display_name=info['display-name'],
