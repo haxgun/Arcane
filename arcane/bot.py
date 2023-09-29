@@ -190,6 +190,10 @@ class Arcane:
         traceback_str = ''.join(traceback.format_tb(e.__traceback__))
         print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
+    async def action_handler(self, msgs: str) -> None:
+        for msg in msgs.split('\r\n'):
+            await self.handle_message(msg)
+
     async def _loop_for_messages(self) -> None:
         try:
             while True:
@@ -197,8 +201,7 @@ class Arcane:
                 msgs = received_msgs.decode()
                 if not msgs:
                     continue
-                for msg in msgs.split('\r\n'):
-                    await self.handle_message(msg)
+                await self.action_handler(msgs)
         except Exception as e:
             await self.parse_error(e)
 
