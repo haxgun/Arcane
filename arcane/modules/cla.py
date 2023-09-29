@@ -1,4 +1,4 @@
-from arcane.bot import bot
+from arcane import bot
 from arcane.models import Channel
 from arcane.modules import print
 from arcane.modules.api.twitch import existing_channel_twitch

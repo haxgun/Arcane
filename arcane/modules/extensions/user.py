@@ -4,7 +4,7 @@ from random import choice
 import pytz
 from dateutil.relativedelta import relativedelta
 
-from arcane.bot import bot
+from arcane import bot
 from arcane.modules.api.twitch import get_user_creation, get_stream_started_at, get_followers
 
 

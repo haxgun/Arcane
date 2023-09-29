@@ -1,1 +1,3 @@
-from .bot import bot
+from arcane.bot import Arcane
+
+bot = Arcane()

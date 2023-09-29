@@ -204,6 +204,3 @@ class Arcane:
                 await self.action_handler(msgs)
         except Exception as e:
             await self.parse_error(e)
-
-
-bot = Arcane()
