@@ -1,17 +1,11 @@
 import hashlib
 import inspect
-import re
 import struct
 import time
 from typing import Any, Optional, List, NamedTuple
 
 from arcane import settings
-
-MSG_RE = re.compile(
-    '^@(?P<info>[^ ]+) :(?P<author>[^!]+).* '
-    'PRIVMSG #(?P<channel>[^ ]+) '
-    ':(?P<message>[^\r]+)',
-)
+from arcane.modules.regex import REGEX
 
 
 def parse_color(s: str) -> tuple[int, int, int]:
@@ -94,7 +88,7 @@ class Message(NamedTuple):
 
     @classmethod
     def parse(cls, bot, msg) -> Optional['Message']:
-        match = MSG_RE.match(msg)
+        match = REGEX['message'].match(msg)
         if match:
 
             info = {}
