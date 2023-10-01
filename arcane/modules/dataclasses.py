@@ -34,6 +34,7 @@ class User:
         self.channel = channel
 
         if info:
+            self.id = info['user-id'] if 'user-id' in info else None
             self.display_name = info['display-name']
             self.color = info['color']
             self.color_rbg = parse_color(info['color']) if info['color'] else _gen_color(self.display_name)
@@ -42,14 +43,9 @@ class User:
             self.is_broadcaster = any(badge.startswith('broadcaster/') for badge in self.badges)
             self.is_moderator = any(badge.startswith('moderator/') for badge in self.badges)
             self.is_subscriber = any(badge.startswith(('founder/', 'subscriber/')) for badge in self.badges)
+            self.is_turbo = any(badge.startswith('turbo/') for badge in self.badges)
             self.is_vip = any(badge.startswith('vip/') for badge in self.badges)
             self.info = info
-
-            try:
-                self.id = info['user-id']
-                self.is_turbo = any(badge.startswith('turbo/') for badge in self.badges)
-            except:
-                pass
 
 
 class Message:
