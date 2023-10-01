@@ -2,7 +2,7 @@ import hashlib
 import inspect
 import struct
 import time
-from typing import Any, Optional, List, NamedTuple
+from typing import Optional, Type
 
 from arcane import settings
 from arcane.modules.regex import REGEX
@@ -23,51 +23,54 @@ def _gen_color(name: str) -> tuple[int, int, int]:
     return r, g, b
 
 
-class User(NamedTuple):
-    id: str
-    name: str
-    display_name: str
-    color: str
-    badges: tuple[str, ...]
-    info: dict[str, str]
+class User:
+    def __init__(
+            self,
+            name: str,
+            channel: str,
+            info: dict[str, str] = None,
+    ) -> None:
+        self.name = name
+        self.channel = channel
 
-    @property
-    def color_rbg(self) -> tuple[int, int, int]:
-        return parse_color(self.info['color']) if self.info['color'] else _gen_color(self.display_name)
+        if info:
+            self.display_name = info['display-name']
+            self.color = info['color']
+            self.color_rbg = parse_color(info['color']) if info['color'] else _gen_color(self.display_name)
+            self.badges = tuple(info['badges'].split(','))
+            self.is_owner = (info['user-id'] == settings.OWNER_ID) if 'user-id' in info else None
+            self.is_broadcaster = any(badge.startswith('broadcaster/') for badge in self.badges)
+            self.is_moderator = any(badge.startswith('moderator/') for badge in self.badges)
+            self.is_subscriber = any(badge.startswith(('founder/', 'subscriber/')) for badge in self.badges)
+            self.is_vip = any(badge.startswith('vip/') for badge in self.badges)
+            self.info = info
 
-    @property
-    def is_owner(self) -> bool:
-        return self.info['user-id'] == settings.OWNER_ID
-
-    @property
-    def is_broadcaster(self) -> bool:
-        return any(badge.startswith('broadcaster/') for badge in self.badges)
-
-    @property
-    def is_moderator(self) -> bool:
-        return any(badge.startswith('moderator/') for badge in self.badges)
-
-    @property
-    def is_subscriber(self) -> bool:
-        return any(badge.startswith(('founder/', 'subscriber/')) for badge in self.badges)
-
-    @property
-    def is_vip(self) -> bool:
-        return any(badge.startswith('vip/') for badge in self.badges)
-
-    @property
-    def is_turbo(self) -> bool:
-        return any(badge.startswith('turbo/') for badge in self.badges)
+            try:
+                self.id = info['user-id']
+                self.is_turbo = any(badge.startswith('turbo/') for badge in self.badges)
+            except:
+                pass
 
 
-class Message(NamedTuple):
-    bot: Any
-    id: str
-    datetime: str
-    author: User
-    channel: str
-    content: str
-    info: dict[str, str]
+class Message:
+    def __init__(
+            self,
+            author: User,
+            channel: str,
+            content: str,
+            bot: Type['Arcane'] = None,
+            datetime: str = None,
+            info: dict[str, str] = None,
+    ) -> None:
+        self.author = author
+        self.channel = channel
+        self.content = content
+        self.bot = bot
+
+        if info:
+            self.id = info['id']
+            self.datetime = datetime
+            self.info = info
 
     @property
     def bg_color(self) -> tuple[int, int, int] | None:
@@ -102,14 +105,10 @@ class Message(NamedTuple):
 
             return cls(
                 bot=bot,
-                id=info['id'],
                 datetime=datetime,
                 author=User(
-                    id=info['user-id'],
                     name=match['author'],
-                    display_name=info['display-name'],
-                    color=info['color'],
-                    badges=tuple(info['badges'].split(',')),
+                    channel=match['channel'],
                     info=info,
                 ),
                 channel=match['channel'],
@@ -129,14 +128,13 @@ class Message(NamedTuple):
 
 
 class Command:
-
     def __init__(
             self,
-            bot,
+            bot: Type['Arcane'],
             name: str,
             desc: str = '',
-            aliases: List[str] = [],
-            permissions: List[str] = [],
+            aliases: list[str] = [],
+            permissions: list[str] = [],
     ) -> None:
         self.name = name
         self.desc = desc
@@ -156,7 +154,7 @@ class Command:
         return self
 
     @staticmethod
-    def check_user_roles(msg) -> List[str]:
+    def check_user_roles(msg) -> list[str]:
         roles = {
             'owner': msg.author.is_owner,
             'broadcaster': msg.author.is_broadcaster,
@@ -236,7 +234,14 @@ class Command:
 
 
 class SubCommand(Command):
-    def __init__(self, parent, name, desc='', aliases=[], permissions: List[str] = []) -> None:
+    def __init__(
+            self,
+            parent: Command,
+            name: str,
+            desc: str = '',
+            aliases: list[Command] = [],
+            permissions: list[str] = []
+    ) -> None:
         self.bot = parent.bot
         self.name = name
         self.parent = parent

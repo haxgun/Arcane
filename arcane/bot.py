@@ -4,14 +4,15 @@ import sys
 import traceback
 import uuid
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Match
 
 from rich.console import Console
 
 from arcane.models import Channel
 from arcane.modules import print
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
-from arcane.modules.dataclasses import Message, Command
+from arcane.modules.dataclasses import Message, Command, User
+from arcane.modules.regex import REGEX
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 
 console = Console()
@@ -35,6 +36,7 @@ class Arcane:
         self.commands: dict = {}
         self.aliases: dict = {}
         self.custom_commands: dict[str, Callable[[Message], None]] = {}
+        self.messages: list[Message] = []
 
     def command(*args, **kwargs) -> Callable[[Message], None]:
         return Command(*args, **kwargs)
@@ -68,6 +70,9 @@ class Arcane:
         message = message.replace('\n', ' ')
         await self._send_command(f'PRIVMSG #{channel} :.me {message}')
 
+    async def _pong(self, src):
+        await self._send_command(f'PONG {src}')
+
     async def _send_privmsg(self, channel: str, message: str) -> None:
         message = message.replace('\n', ' ')
         await self._send_command(f'PRIVMSG #{channel} :{message}')
@@ -92,6 +97,11 @@ class Arcane:
 
     async def part_channel(self, channel: str) -> None:
         await self._send_command(f'PART #{channel}')
+
+    async def _cache(self, message):
+        self.messages.append(message)
+        if len(self.messages) > 100:
+            self.messages.pop(0)
 
     @staticmethod
     async def _load_extensions() -> None:
@@ -161,12 +171,123 @@ class Arcane:
             self.loop.stop()
             sys.exit(0)
 
-    async def handle_message(self, received_msg: str) -> None:
-        if len(received_msg) == 0:
-            return
+    @staticmethod
+    async def parse_error(e: Exception) -> None:
+        traceback_str = ''.join(traceback.format_tb(e.__traceback__))
+        print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
-        message = Message.parse(self, received_msg)
+    async def action_handler(self, message: str) -> None:
+        try:
+            if message.startswith('PING'):
+                regex_tempalte = REGEX['ping']
+            else:
+                regex_tempalte = REGEX['data']
 
+            message_data = regex_tempalte.match(message)
+            info = await self.get_info(message_data)
+
+            action = message_data.group('action') if message_data.group('action') else 'PING'
+            data = message_data.group('data')
+            content = message_data.group('content')
+            channel = message_data.group('channel')
+        except Exception:
+            pass
+        else:
+            try:
+                if not action:
+                    return
+                if action == 'PING':
+                    await self._pong(content)
+
+                elif action == 'PRIVMSG':
+                    message_object = Message.parse(self, message)
+                    await self._cache(message_object)
+                    await self.event_message(message_object)
+
+                elif action == 'WHISPER':
+                    message_object = Message.parse(self, message)
+                    await self._cache(message_object)
+                    await self.event_private_message(message_object)
+
+                elif action == 'JOIN':
+                    sender = REGEX['author'].match(data).group('author')
+                    await self.event_user_join(User(sender, channel))
+
+                elif action == 'PART':
+                    sender = REGEX['author'].match(data).group('author')
+                    await self.event_user_leave(User(sender, channel))
+
+                elif action == 'MODE':
+                    content_data = REGEX['mode'].match(content)
+                    mode = content_data.group('mode')
+                    user = content_data.group('user')
+                    user_object = User(user, channel)
+
+                    if mode == '+':
+                        await self.event_user_op(user_object)
+                    else:
+                        await self.event_user_deop(user_object)
+
+                elif action == 'USERSTATE':
+                    if info['mod'] == 1:
+                        self.is_mod = True
+                    else:
+                        self.is_mod = False
+                    await self.event_userstate(User(self.username, channel, info))
+
+                elif action == 'ROOMSTATE':
+                    await self.event_roomstate(channel, info)
+
+                elif action == 'NOTICE':
+                    await self.event_notice(channel, info)
+
+                elif action == 'CLEARCHAT':
+                    if not content:
+                        await self.event_clear(channel)
+                    else:
+                        if 'ban-duration' in info.keys():
+                            await self.event_timeout(User(content, channel), info)
+                        else:
+                            await self.event_ban(User(content, channel), info)
+
+                elif action == 'HOSTTARGET':
+                    m = REGEX['host'].match(content)
+                    hchannel = m.group('channel')
+                    viewers = m.group('count')
+                    if channel == '-':
+                        await self.event_host_stop(channel, viewers)
+                    else:
+                        await self.event_host_start(channel, hchannel, viewers)
+
+                elif action == 'USERNOTICE':
+                    message = content or ''
+                    user = info['login']
+                    await self.event_subscribe(Message(message, user, channel, info), info)
+
+                elif action == 'CAP':
+                    return
+                else:
+                    console.print('Unknown event:', action)
+                    console.print(message)
+
+            except Exception as e:
+                await self.parse_error(e)
+
+    @staticmethod
+    async def get_info(message: Match) -> dict | None:
+        try:
+            info = message.group('info')
+            info_dict = {}
+            for data in info.split(';'):
+                variable = data.split('=')
+                if variable[1].isnumeric():
+                    variable[1] = int(variable[1])
+                info_dict[variable[0]] = variable[1]
+            return info_dict
+        except Exception:
+            return None
+
+    async def event_message(self, message: Message) -> None:
         if DEBUG and message:
             console.print(message)
 
@@ -185,22 +306,52 @@ class Arcane:
                     command = self.aliases[command]
                     await self.commands[command].execute_command(message)
 
-    @staticmethod
-    async def parse_error(e: Exception) -> None:
-        traceback_str = ''.join(traceback.format_tb(e.__traceback__))
-        print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
+    async def event_private_message(self, message: Message) -> None:
+        pass
 
-    async def action_handler(self, msgs: str) -> None:
-        for msg in msgs.split('\r\n'):
-            await self.handle_message(msg)
+    async def event_user_join(self, user: User) -> None:
+        pass
+
+    async def event_user_leave(self, user: User) -> None:
+        pass
+
+    async def event_user_op(self, user: User) -> None:
+        pass
+
+    async def event_user_deop(self, user: User) -> None:
+        pass
+
+    async def event_userstate(self,  user: User) -> None:
+        pass
+
+    async def event_roomstate(self, channel, info) -> None:
+        pass
+
+    async def event_notice(self, channel, info) -> None:
+        pass
+
+    async def event_clear(self, channel) -> None:
+        pass
+
+    async def event_timeout(self, user: User, info) -> None:
+        pass
+
+    async def event_ban(self, user: User, info) -> None:
+        pass
+
+    async def event_host_start(self, channel, hosted_channel, viewer_count) -> None:
+        pass
+
+    async def event_host_stop(self, channel, viewer_count) -> None:
+        pass
+
+    async def event_subscribe(self, message: Message, tags) -> None:
+        pass
 
     async def _loop_for_messages(self) -> None:
-        try:
-            while True:
-                received_msgs = await self.reader.readline()
-                msgs = received_msgs.decode()
-                if not msgs:
-                    continue
-                await self.action_handler(msgs)
-        except Exception as e:
-            await self.parse_error(e)
+        while True:
+            received_msg = await self.reader.readline()
+            message = received_msg.decode().strip()
+            if not message:
+                continue
+            await self.action_handler(message)
