@@ -75,6 +75,7 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
     teams = game_data['teams']
     map_name = game_data['meta']['map']['name']
     match_id = game_data['meta']['id']
+    team = game_data['stats']['team']
 
     character = stats['character']['name']
     kills = stats['kills']
@@ -94,11 +95,18 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
     blue_score = teams['blue']
 
     if red_score > blue_score:
-        win_status = 'Win'
+        win = 'Red'
     elif red_score < blue_score:
-        win_status = 'Loss'
+        win = 'Blue'
     else:
-        win_status = 'Drew'
+        win = 'Drew'
 
-    return (f'{map_name} - {win_status} - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
+    if team == win:
+        win_status = 'W'
+    elif win == 'Drew':
+        win_status = 'D'
+    else:
+        win_status = 'L'
+
+    return (f'{map_name} [{win_status}] - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
             f'https://tracker.gg/valorant/match/{match_id}')
