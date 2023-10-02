@@ -57,15 +57,18 @@ async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
         return data
 
 
-async def get_matches(name_with_tag: str, mode: str = 'competitive', size: int = 1) -> dict | str:
+async def get_matches(name_with_tag: str, mode: str = 'competitive', size: int = None) -> dict | str:
     puuid = await get_puuid(name_with_tag)
     region = await get_region(name_with_tag)
-    url = f'{api_url}/valorant/v1/by-puuid/lifetime/matches/{region}/{puuid}?mode={mode}&size={size}'
+    if size:
+        url = f'{api_url}/valorant/v1/by-puuid/lifetime/matches/{region}/{puuid}?mode={mode}&size={size}'
+    else:
+        url = f'{api_url}/valorant/v1/by-puuid/lifetime/matches/{region}/{puuid}?mode={mode}&size=30'
     return await fetch_data(url)
 
 
 async def get_stats_last_game(name_with_tag: str) -> dict | str:
-    data = await get_matches(name_with_tag)
+    data = await get_matches(name_with_tag, size=1)
     game_data = data['data'][0]
 
     stats = game_data['stats']
