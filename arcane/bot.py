@@ -114,6 +114,7 @@ class Arcane:
                 except Exception as e:
                     print.error(f'\'{extension}\' failed to load.')
                     print.error(f'Error: {e}')
+        console.print()
 
     async def setup(self) -> None:
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
