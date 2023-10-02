@@ -70,8 +70,8 @@ class Arcane:
         message = message.replace('\n', ' ')
         await self._send_command(f'PRIVMSG #{channel} :.me {message}')
 
-    async def _pong(self, src):
-        await self._send_command(f'PONG {src}')
+    async def _pong(self):
+        await self._send_command('PONG :tmi.twitch.tv')
 
     async def _send_privmsg(self, channel: str, message: str) -> None:
         message = message.replace('\n', ' ')
@@ -196,8 +196,9 @@ class Arcane:
             try:
                 if not action:
                     return
+
                 if action == 'PING':
-                    await self._pong(content)
+                    await self._pong()
 
                 elif action == 'PRIVMSG':
                     message_object = Message.parse(self, message)
