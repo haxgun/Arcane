@@ -178,12 +178,8 @@ class Arcane:
 
     async def action_handler(self, message: str) -> None:
         try:
-            if message.startswith('PING'):
-                regex_tempalte = REGEX['ping']
-            else:
-                regex_tempalte = REGEX['data']
-
-            message_data = regex_tempalte.match(message)
+            regex_template = REGEX['ping'] if message.startswith('PING') else REGEX['data']
+            message_data = regex_template.match(message)
             info = await self.get_info(message_data)
 
             action = message_data.group('action') if message_data.group('action') else 'PING'
@@ -191,88 +187,87 @@ class Arcane:
             content = message_data.group('content')
             channel = message_data.group('channel')
         except Exception:
-            pass
-        else:
-            try:
-                if not action:
-                    return
+            return
+        try:
+            if not action:
+                return
 
-                if action == 'PING':
-                    await self._pong()
+            if action == 'PING':
+                await self._pong()
 
-                elif action == 'PRIVMSG':
-                    message_object = Message.parse(self, message)
-                    await self._cache(message_object)
-                    await self.event_message(message_object)
+            elif action == 'PRIVMSG':
+                message_object = Message.parse(self, message)
+                await self._cache(message_object)
+                await self.event_message(message_object)
 
-                elif action == 'WHISPER':
-                    message_object = Message.parse(self, message)
-                    await self._cache(message_object)
-                    await self.event_private_message(message_object)
+            elif action == 'WHISPER':
+                message_object = Message.parse(self, message)
+                await self._cache(message_object)
+                await self.event_private_message(message_object)
 
-                elif action == 'JOIN':
-                    sender = REGEX['author'].match(data).group('author')
-                    await self.event_user_join(User(sender, channel))
+            elif action == 'JOIN':
+                sender = REGEX['author'].match(data).group('author')
+                await self.event_user_join(User(sender, channel))
 
-                elif action == 'PART':
-                    sender = REGEX['author'].match(data).group('author')
-                    await self.event_user_leave(User(sender, channel))
+            elif action == 'PART':
+                sender = REGEX['author'].match(data).group('author')
+                await self.event_user_leave(User(sender, channel))
 
-                elif action == 'MODE':
-                    content_data = REGEX['mode'].match(content)
-                    mode = content_data.group('mode')
-                    user = content_data.group('user')
-                    user_object = User(user, channel)
+            elif action == 'MODE':
+                content_data = REGEX['mode'].match(content)
+                mode = content_data.group('mode')
+                user = content_data.group('user')
+                user_object = User(user, channel)
 
-                    if mode == '+':
-                        await self.event_user_op(user_object)
-                    else:
-                        await self.event_user_deop(user_object)
-
-                elif action == 'USERSTATE':
-                    if info['mod'] == 1:
-                        self.is_mod = True
-                    else:
-                        self.is_mod = False
-                    await self.event_userstate(User(self.username, channel, info))
-
-                elif action == 'ROOMSTATE':
-                    await self.event_roomstate(channel, info)
-
-                elif action == 'NOTICE':
-                    await self.event_notice(channel, info)
-
-                elif action == 'CLEARCHAT':
-                    if not content:
-                        await self.event_clear(channel)
-                    else:
-                        if 'ban-duration' in info.keys():
-                            await self.event_timeout(User(content, channel), info)
-                        else:
-                            await self.event_ban(User(content, channel), info)
-
-                elif action == 'HOSTTARGET':
-                    m = REGEX['host'].match(content)
-                    hchannel = m.group('channel')
-                    viewers = m.group('count')
-                    if channel == '-':
-                        await self.event_host_stop(channel, viewers)
-                    else:
-                        await self.event_host_start(channel, hchannel, viewers)
-
-                elif action == 'USERNOTICE':
-                    message = content or ''
-                    user = info['login']
-                    await self.event_subscribe(Message(message, user, channel, info), info)
-
-                elif action == 'CAP':
-                    return
+                if mode == '+':
+                    await self.event_user_op(user_object)
                 else:
-                    console.print('Unknown event:', action)
-                    console.print(message)
+                    await self.event_user_deop(user_object)
 
-            except Exception as e:
-                await self.parse_error(e)
+            elif action == 'USERSTATE':
+                if info['mod'] == 1:
+                    self.is_mod = True
+                else:
+                    self.is_mod = False
+                await self.event_userstate(User(self.username, channel, info))
+
+            elif action == 'ROOMSTATE':
+                await self.event_roomstate(channel, info)
+
+            elif action == 'NOTICE':
+                await self.event_notice(channel, info)
+
+            elif action == 'CLEARCHAT':
+                if not content:
+                    await self.event_clear(channel)
+                else:
+                    if 'ban-duration' in info.keys():
+                        await self.event_timeout(User(content, channel), info)
+                    else:
+                        await self.event_ban(User(content, channel), info)
+
+            elif action == 'HOSTTARGET':
+                m = REGEX['host'].match(content)
+                hchannel = m.group('channel')
+                viewers = m.group('count')
+                if channel == '-':
+                    await self.event_host_stop(channel, viewers)
+                else:
+                    await self.event_host_start(channel, hchannel, viewers)
+
+            elif action == 'USERNOTICE':
+                message = content or ''
+                user = info['login']
+                await self.event_subscribe(Message(message, user, channel, info), info)
+
+            elif action == 'CAP':
+                return
+            else:
+                console.print('Unknown event:', action)
+                console.print(message)
+
+        except Exception as e:
+            await self.parse_error(e)
 
     @staticmethod
     async def get_info(message: Match) -> dict | None:
