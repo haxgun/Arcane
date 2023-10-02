@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import aiohttp
 
 api_url = 'https://api.henrikdev.xyz'
@@ -110,3 +112,40 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
 
     return (f'{map_name} [{win_status}] - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
             f'https://tracker.gg/valorant/match/{match_id}')
+
+
+def is_last_24_hours(date_str):
+    current_datetime = datetime.now()
+    last_24_hours = current_datetime - timedelta(hours=24)
+    date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+    return date_obj >= last_24_hours
+
+
+async def get_win_lose(name_with_tag: str) -> tuple[int, int]:
+    data = await get_matches(name_with_tag)
+    filtered_data = [item for item in data['data'] if is_last_24_hours(item['meta']['started_at'])]
+    win_count = 0
+    lose_count = 0
+    drew_count = 0
+
+    for item in filtered_data:
+        teams = item['teams']
+        red_score = teams['red']
+        blue_score = teams['blue']
+        team = item['stats']['team']
+
+        if red_score > blue_score:
+            win = 'Red'
+        elif red_score < blue_score:
+            win = 'Blue'
+        else:
+            win = 'Drew'
+
+        if team == win:
+            win_count += 1
+        elif win == 'Drew':
+            drew_count += 1
+        else:
+            lose_count += 1
+
+    return win_count, lose_count
