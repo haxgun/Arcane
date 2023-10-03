@@ -54,7 +54,7 @@ async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
         if mmr_change > 0:
             mmr_change = '+' + str(mmr_change)
 
-        return f'{rank} - {rr}RR - {elo} elo ({mmr_change}) - https://tracker.gg/valorant/profile/riot/{name}%23{tag}'
+        return f'{rank} - {rr}RR - {elo} elo ({mmr_change})'
     else:
         return data
 
@@ -112,6 +112,8 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
 
     return (f'{map_name} [{win_status}] - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
             f'https://tracker.gg/valorant/match/{match_id}')
+    return (f'{map_name} ({win_status}: {red_score}/{blue_score}) - {character} - {kills}/{deaths}/{assists} - HS: '
+            f'{head_shot_percentage}%')
 
 
 def is_last_24_hours(date_str):
