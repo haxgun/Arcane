@@ -303,6 +303,14 @@ class Arcane:
                     command = self.aliases[command]
                     await self.commands[command].execute_command(message)
 
+    async def _loop_for_messages(self) -> None:
+        while True:
+            received_msg = await self.reader.readline()
+            message = received_msg.decode().strip()
+            if not message:
+                continue
+            await self.action_handler(message)
+
     async def event_private_message(self, message: Message) -> None:
         pass
 
@@ -344,11 +352,3 @@ class Arcane:
 
     async def event_subscribe(self, message: Message, tags) -> None:
         pass
-
-    async def _loop_for_messages(self) -> None:
-        while True:
-            received_msg = await self.reader.readline()
-            message = received_msg.decode().strip()
-            if not message:
-                continue
-            await self.action_handler(message)
