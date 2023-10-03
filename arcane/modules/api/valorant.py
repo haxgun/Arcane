@@ -110,8 +110,6 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
     else:
         win_status = 'L'
 
-    return (f'{map_name} [{win_status}] - {character} - {kills}/{deaths}/{assists} - HS: {head_shot_percentage}% - '
-            f'https://tracker.gg/valorant/match/{match_id}')
     return (f'{map_name} ({win_status}: {red_score}/{blue_score}) - {character} - {kills}/{deaths}/{assists} - HS: '
             f'{head_shot_percentage}%')
 
