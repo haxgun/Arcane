@@ -36,7 +36,6 @@ class Arcane:
         self.channels: list[str] = Channel.get_all_channel_names()
         self.commands: dict = {}
         self.aliases: dict = {}
-        self.custom_commands: dict[str, Callable[[Message], None]] = {}
         self.messages: list[Message] = []
 
     def command(*args, **kwargs) -> Callable[[Message], None]:
