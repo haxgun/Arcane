@@ -4,6 +4,17 @@ from arcane.modules.api.valorant import get_rank_with_rr_and_elo, get_stats_last
 from arcane.modules.dataclasses import Message
 
 
+@bot.command(name='tracker', aliases=['profile'])
+async def cmd_valorant_tracker(msg: Message, valorant_name: str = None) -> None:
+    if not valorant_name or '#' not in valorant_name:
+        channel = Channel.get(Channel.name == msg.channel)
+        valorant_name = channel.valorant
+    if valorant_name:
+        name, tag = valorant_name.split('#')
+        name = name.replace(' ', '%20')
+        await msg.reply(f'Tracker - https://tracker.gg/valorant/profile/riot/{name}%23{tag}')
+
+
 @bot.command(name='rank')
 async def cmd_valorant_rank(msg: Message, valorant_name: str = None) -> None:
     if not valorant_name or '#' not in valorant_name:
