@@ -11,6 +11,7 @@ from rich.console import Console
 from arcane.models import Channel
 from arcane.modules import print
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
+from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.dataclasses import Message, Command, User
 from arcane.modules.regex import REGEX
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
@@ -302,6 +303,8 @@ class Arcane:
                 elif command in self.aliases:
                     command = self.aliases[command]
                     await self.commands[command].execute_command(message)
+                else:
+                    await handle_custom_commands(message)
 
     async def _loop_for_messages(self) -> None:
         while True:
