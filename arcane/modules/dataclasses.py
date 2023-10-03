@@ -209,7 +209,6 @@ class Command:
                 new_content = ' '.join(c[1:])
                 await self.subcommands[subcomm].run(Message(
                     bot=message.bot,
-                    id=message.id,
                     datetime=message.datetime,
                     author=message.author,
                     channel=message.channel,
