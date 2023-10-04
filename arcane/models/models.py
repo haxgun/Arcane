@@ -19,7 +19,6 @@ class BaseModel(Model):
 
 class Channel(BaseModel):
     prefix = CharField(default=PREFIX, max_length=1)
-    cooldown = IntegerField(default=5)
     valorant = CharField(null=True)
 
     class Meta:
@@ -33,6 +32,7 @@ class Channel(BaseModel):
 class Command(BaseModel):
     response = CharField(default="Нет ответа")
     channel = ForeignKeyField(Channel, backref='commands', on_delete='CASCADE')
+    cooldown = IntegerField(default=15)
 
     class Meta:
         db_table = 'commands'

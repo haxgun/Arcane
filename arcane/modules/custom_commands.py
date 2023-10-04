@@ -6,7 +6,26 @@ from peewee import DoesNotExist
 from arcane.models import Channel, Command, Alias
 from arcane.modules.dataclasses import Message
 
-cooldowns = {}
+
+class CommandCooldown:
+    def __init__(self):
+        self.cooldowns = {}
+
+    def can_use_command(self, user_id, command, cooldown_duration):
+        key = f'{user_id}:{command}'
+        if key in self.cooldowns:
+            last_used_time = self.cooldowns[key]
+            current_time = time.time()
+            if current_time - last_used_time < cooldown_duration:
+                return False
+        return True
+
+    def update_command_cooldown(self, user_id, command):
+        key = f'{user_id}:{command}'
+        self.cooldowns[key] = time.time()
+
+
+command_cooldown_manager = CommandCooldown()
 
 
 def starts_with_emoji(text) -> bool:
@@ -27,41 +46,18 @@ async def find_entity(msg: Message, EntityModel) -> bool:
         return False
 
 
-async def custom_command_response(msg: Message) -> str:
+async def get_command_data(msg: Message, EntityModel) -> tuple:
     command_name = msg.content.split()[0][1:]
     channel = Channel.get(Channel.name == msg.channel)
-    command = Command.get(Command.name == command_name, Command.channel == channel)
-    return command.response
-
-
-async def alias_response(msg: Message) -> str:
-    alias_name = msg.content.split()[0][1:]
-    channel = Channel.get(Channel.name == msg.channel)
-    alias = Alias.get(Alias.name == alias_name, Alias.channel == channel)
-    command = alias.command
-    return command.response
-
-
-async def can_use_command(user_id: str, command: str, cooldown_duration: int) -> bool:
-    key = f'{user_id}:{command}'
-
-    if key in cooldowns:
-        last_used_time = cooldowns[key]
-        current_time = time.time()
-        if current_time - last_used_time < cooldown_duration:
-            return False
-    return True
-
-
-async def update_command_cooldown(user_id: str, command: str) -> None:
-    key = f'{user_id}:{command}'
-    cooldowns[key] = time.time()
+    entity = EntityModel.get(EntityModel.name == command_name, EntityModel.channel == channel)
+    cooldown = entity.cooldown
+    response = entity.response
+    return command_name, cooldown, response
 
 
 async def handle_custom_commands(msg: Message) -> None:
-    entity = None
-    response = None
     count = 1
+    command_name, response, cooldown = None, None, None
 
     if msg.author.is_broadcaster or msg.author.is_moderator:
         if len(msg.content.split()) > 1:
@@ -71,17 +67,14 @@ async def handle_custom_commands(msg: Message) -> None:
                 pass
 
     if await find_entity(msg, Command):
-        entity = Command
-        response = await custom_command_response(msg)
+        command_name, cooldown, response = await get_command_data(msg, Command)
     elif await find_entity(msg, Alias):
-        entity = Alias
-        response = await alias_response(msg)
+        command_name, cooldown, response = await get_command_data(msg, Alias)
 
-    if entity and response:
+    if response and cooldown:
         user_id = msg.author.id
-        command = msg.content.split()[0][1:]
-        cooldown_duration = 5
-        if await can_use_command(user_id, command, cooldown_duration):
-            await update_command_cooldown(user_id, command)
+
+        if command_cooldown_manager.can_use_command(user_id, command_name, cooldown):
+            command_cooldown_manager.update_command_cooldown(user_id, command_name)
             for _ in range(count):
                 await msg.send(response) if count > 1 else await msg.reply(response)
