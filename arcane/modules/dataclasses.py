@@ -2,10 +2,13 @@ import hashlib
 import inspect
 import struct
 import time
-from typing import Optional, Type
+from typing import Optional, TYPE_CHECKING
 
 from arcane import settings
 from arcane.modules.regex import REGEX
+
+if TYPE_CHECKING:
+    from arcane import Arcane
 
 
 def parse_color(s: str) -> tuple[int, int, int]:
@@ -54,7 +57,7 @@ class Message:
             author: User,
             channel: str,
             content: str,
-            bot: Type['Arcane'] = None,
+            bot: 'Arcane' = None,
             datetime: str = None,
             info: dict[str, str] = None,
     ) -> None:
@@ -126,7 +129,7 @@ class Message:
 class Command:
     def __init__(
             self,
-            bot: Type['Arcane'],
+            bot: 'Arcane',
             name: str,
             desc: str = '',
             aliases: list[str] = [],
