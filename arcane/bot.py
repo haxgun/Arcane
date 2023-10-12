@@ -25,7 +25,7 @@ class Arcane:
         self.ready: bool = False
         self.host: str = 'irc.chat.twitch.tv'
         self.port: int = 6697
-        self.loop: asyncio.AbstractEventLoop | None = None
+        self.loop: asyncio.AbstractEventLoop | None = None or asyncio.get_event_loop()
         self.reader: asyncio.StreamReader | None = None
         self.writer: asyncio.StreamWriter | None = None
         self.token: str = ACCESS_TOKEN
@@ -149,28 +149,20 @@ class Arcane:
         print.success('Have a nice day!\n')
 
     def run(self) -> None:
-        self.loop = asyncio.new_event_loop()
-        self.loop.run_until_complete(self.setup())
+        try:
+            task_setup = self.setup()
+            self.loop.run_until_complete(task_setup)
+            self.loop.run_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            task_stop = self.stop()
+            self.loop.run_until_complete(task_stop)
+            self.loop.close()
 
-    async def stop(self, exit: bool = False) -> None:
-        print.error('Goodbey!')
+    async def stop(self) -> None:
         if self.writer:
             self.writer.close()
-            self.loop.create_task(self.writer.wait_closed())
-
-        pending = asyncio.Task.all_tasks()
-        gathered = asyncio.gather(*pending)
-
-        try:
-            gathered.cancel()
-            self.loop.run_until_complete(gathered)
-            gathered.exception()
-        except Exception:
-            pass
-
-        if exit:
-            self.loop.stop()
-            sys.exit(0)
 
     @staticmethod
     async def parse_error(e: Exception) -> None:
