@@ -54,7 +54,7 @@ async def get_rank_with_rr_and_elo(name_with_tag: str) -> str:
         if mmr_change > 0:
             mmr_change = '+' + str(mmr_change)
 
-        return f'{rank} - {rr}RR - {elo} elo ({mmr_change})'
+        return f'{rank} - {rr}RR - {elo} elo'
     else:
         return data
 
