@@ -5,10 +5,9 @@ import uuid
 from pathlib import Path
 from typing import Callable
 
-from rich.console import Console
-
 from arcane.models import Channel
 from arcane.modules import print
+from arcane.modules import printt
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
 from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.dataclasses import Message, Command, User
@@ -107,15 +106,15 @@ class Arcane:
     @staticmethod
     async def _load_extensions() -> None:
         extension_paths = [p.stem for p in Path('./arcane/modules/extensions/').glob('*.py')]
-        with console.status('[bold] Loading extensions...'):
+        with printt.status('[bold] Loading extensions...'):
             for extension in extension_paths:
                 try:
                     importlib.import_module(f'arcane.modules.extensions.{extension}')
-                    print.success(f'\'{extension}\' loaded.')
+                    printt.success(f'\'{extension}\' loaded.')
                 except Exception as e:
-                    print.error(f'\'{extension}\' failed to load.')
-                    print.error(f'Error: {e}')
-        console.print()
+                    printt.error(f'\'{extension}\' failed to load.')
+                    printt.error(f'Error: {e}')
+        printt.printt()
 
     async def setup(self) -> None:
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
@@ -139,15 +138,15 @@ class Arcane:
         self.ready = True
 
         if DEBUG:
-            console.print('[red bold][!!!!!!] DEBUG MODE ENABLED [!!!!!!][/]')
+            printt.printt('[red bold][!!!!!!] DEBUG MODE ENABLED [!!!!!!][/]')
 
         bot_nick = f'[link=https://twitch.tv/{self.username}][yellow]@{self.username}[/link][/yellow]'
-        print.success(f'Connected as {bot_nick} with ID: {self.id}')
+        printt.success(f'Connected as {bot_nick} with ID: {self.id}')
         channel_connected = ', '.join(
             [f'[link=https://twitch.tv/{channel}][yellow]@{channel}[/link][/yellow]' for channel in
              self.channels])
-        print.success(f'Connected to {channel_connected}')
-        print.success('Have a nice day!\n')
+        printt.success(f'Connected to {channel_connected}')
+        printt.success('Have a nice day!\n')
 
     def run(self) -> None:
         try:
@@ -168,7 +167,7 @@ class Arcane:
     @staticmethod
     async def parse_error(e: Exception) -> None:
         traceback_str = ''.join(traceback.format_tb(e.__traceback__))
-        print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
+        printt.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
     async def action_handler(self, message: str) -> None:
         info, action, data, content, channel = await parser(message)
@@ -248,8 +247,8 @@ class Arcane:
             elif action == 'CAP':
                 return
             else:
-                console.print('Unknown event:', action)
-                console.print(message)
+                printt.printt('Unknown event:', action)
+                printt.printt(message)
 
         except Exception as e:
             await self.parse_error(e)

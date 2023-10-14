@@ -8,7 +8,7 @@ from dateutil.parser import parse as parse_datetime
 from fuzzywuzzy import fuzz
 
 from arcane import settings
-from arcane.modules import print
+from arcane.modules import printt
 
 headers = {
     'Client-ID': settings.CLIENT_ID,
@@ -30,7 +30,7 @@ async def get_bot_username() -> str:
                 if 'data' in data and len(data['data']) > 0:
                     return data['data'][0]['login']
             except Exception as e:
-                print.error(f'Error: {e}')
+                printt.error(f'Error: {e}')
 
 
 async def get_bot_user_id() -> int:

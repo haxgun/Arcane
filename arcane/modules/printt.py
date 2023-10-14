@@ -2,6 +2,8 @@ from rich.console import Console
 from rich.prompt import Prompt
 
 console = Console()
+status = console.status
+printt = console.print
 
 
 def success(message: str) -> None:
