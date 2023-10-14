@@ -254,6 +254,15 @@ class Arcane:
         except Exception as e:
             await self.parse_error(e)
 
+    async def _loop_for_messages(self) -> None:
+        while True:
+            received_msg = await self.reader.readline()
+            message = received_msg.decode().strip()
+
+            if not message:
+                continue
+            await self.action_handler(message)
+
     async def event_message(self, message: Message) -> None:
         if DEBUG and message:
             console.print(message)
@@ -276,15 +285,6 @@ class Arcane:
                     await self.commands[command].execute_command(message)
                 else:
                     await handle_custom_commands(message)
-
-    async def _loop_for_messages(self) -> None:
-        while True:
-            received_msg = await self.reader.readline()
-            message = received_msg.decode().strip()
-
-            if not message:
-                continue
-            await self.action_handler(message)
 
     async def event_private_message(self, message: Message) -> None:
         pass
