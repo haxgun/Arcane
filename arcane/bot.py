@@ -175,17 +175,32 @@ class Arcane:
             message_data = regex_template.match(message)
             info = await self.get_info(message_data)
 
-            action = message_data.group('action') if message_data.group('action') else 'PING'
-            data = message_data.group('data')
-            content = message_data.group('content')
-            channel = message_data.group('channel')
+            try:
+                action = message_data.group('action')
+            except Exception:
+                action = 'PING'
+
+            try:
+                data = message_data.group('data')
+            except Exception:
+                data = None
+
+            try:
+                content = message_data.group('content')
+            except Exception:
+                content = None
+
+            try:
+                channel = message_data.group('channel')
+            except Exception:
+                channel = None
         except Exception:
-            return
+            pass
         try:
             if not action:
                 return
 
-            if action == 'PING':
+            elif action == 'PING':
                 await self._pong()
 
             elif action == 'PRIVMSG':
@@ -301,6 +316,7 @@ class Arcane:
         while True:
             received_msg = await self.reader.readline()
             message = received_msg.decode().strip()
+
             if not message:
                 continue
             await self.action_handler(message)
