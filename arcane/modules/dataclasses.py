@@ -183,6 +183,7 @@ class Command:
                 await self.run(message)
 
     async def run(self, message: 'Message') -> None:
+        message_channel = message.channel
         args = message.content[len(self.bot.prefix):].split(' ')[1:]
 
         args_name = inspect.getfullargspec(self.func)[0][1:]
@@ -210,8 +211,8 @@ class Command:
             try:
                 subcomm = args.pop(0).split(' ')[0]
             except Exception:
-                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
-                    command_cooldown_manager.update_command_cooldown(self.func)
+                if command_cooldown_manager.can_use_command(message_channel, self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(message_channel, self.func)
                     await self.func(message, *args)
                 return
             if subcomm in self.subcommands:
@@ -226,13 +227,13 @@ class Command:
                     info=message.info,
                 ))
             else:
-                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
-                    command_cooldown_manager.update_command_cooldown(self.func)
+                if command_cooldown_manager.can_use_command(message_channel, self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(message_channel, self.func)
                     await self.func(message, *args)
         else:
             try:
-                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
-                    command_cooldown_manager.update_command_cooldown(self.func)
+                if command_cooldown_manager.can_use_command(message_channel, self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(message_channel, self.func)
                     await self.func(message, *args)
             except TypeError as e:
                 if len(args) < len(args_name):

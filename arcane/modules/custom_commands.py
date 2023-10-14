@@ -36,6 +36,7 @@ async def get_command_data(msg: Message, EntityModel) -> tuple:
 async def handle_custom_commands(msg: Message) -> None:
     count = 1
     command_name, response, cooldown = None, None, None
+    channel = msg.channel
 
     if msg.author.is_broadcaster or msg.author.is_moderator:
         if len(msg.content.split()) > 1:
@@ -50,7 +51,7 @@ async def handle_custom_commands(msg: Message) -> None:
         command_name, cooldown, response = await get_command_data(msg, Alias)
 
     if response and cooldown:
-        if command_cooldown_manager.can_use_command(command_name, cooldown):
-            command_cooldown_manager.update_command_cooldown(command_name)
+        if command_cooldown_manager.can_use_command(channel, command_name, cooldown):
+            command_cooldown_manager.update_command_cooldown(channel, command_name)
             for _ in range(count):
                 await msg.send(response) if count > 1 else await msg.reply(response)
