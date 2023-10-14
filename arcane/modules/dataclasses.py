@@ -5,6 +5,7 @@ import time
 from typing import Optional, TYPE_CHECKING
 
 from arcane import settings
+from arcane.modules.cooldowns import command_cooldown_manager
 from arcane.modules.regex import REGEX
 
 if TYPE_CHECKING:
@@ -135,12 +136,14 @@ class Command:
             aliases: list[str] = [],
             permissions: list[str] = [],
             hidden: bool = False,
+            cooldown: int = 15,
     ) -> None:
         self.name = name
         self.desc = desc
         self.aliases = aliases
         self.permissions = permissions
         self.subcommands = {}
+        self.cooldown = cooldown
         self.bot = bot
 
         if hidden:
@@ -211,7 +214,9 @@ class Command:
             try:
                 subcomm = args.pop(0).split(' ')[0]
             except Exception:
-                await self.func(message, *args)
+                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(self.func)
+                    await self.func(message, *args)
                 return
             if subcomm in self.subcommands.keys():
                 c = message.content.split(' ')
@@ -225,11 +230,15 @@ class Command:
                     info=message.info,
                 ))
             else:
-                await self.func(message, *args)
+                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(self.func)
+                    await self.func(message, *args)
 
         else:
             try:
-                await self.func(message, *args)
+                if command_cooldown_manager.can_use_command(self.func, self.cooldown):
+                    command_cooldown_manager.update_command_cooldown(self.func)
+                    await self.func(message, *args)
             except TypeError as e:
                 if len(args) < len(args_name):
                     raise Exception(f'Not enough arguments for {self.name}, required arguments: {", ".join(args_name)}')
@@ -244,7 +253,7 @@ class SubCommand(Command):
             name: str,
             desc: str = '',
             aliases: list[Command] = [],
-            permissions: list[str] = []
+            permissions: list[str] = [],
     ) -> None:
         self.bot = parent.bot
         self.name = name

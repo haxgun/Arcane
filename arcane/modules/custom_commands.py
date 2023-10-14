@@ -1,31 +1,9 @@
-import time
-
 import emoji
 from peewee import DoesNotExist
 
 from arcane.models import Channel, Command, Alias
+from arcane.modules.cooldowns import command_cooldown_manager
 from arcane.modules.dataclasses import Message
-
-
-class CommandCooldown:
-    def __init__(self):
-        self.cooldowns = {}
-
-    def can_use_command(self, user_id, command, cooldown_duration):
-        key = f'{user_id}:{command}'
-        if key in self.cooldowns:
-            last_used_time = self.cooldowns[key]
-            current_time = time.time()
-            if current_time - last_used_time < cooldown_duration:
-                return False
-        return True
-
-    def update_command_cooldown(self, user_id, command):
-        key = f'{user_id}:{command}'
-        self.cooldowns[key] = time.time()
-
-
-command_cooldown_manager = CommandCooldown()
 
 
 def starts_with_emoji(text) -> bool:
@@ -72,9 +50,7 @@ async def handle_custom_commands(msg: Message) -> None:
         command_name, cooldown, response = await get_command_data(msg, Alias)
 
     if response and cooldown:
-        user_id = msg.author.id
-
-        if command_cooldown_manager.can_use_command(user_id, command_name, cooldown):
-            command_cooldown_manager.update_command_cooldown(user_id, command_name)
+        if command_cooldown_manager.can_use_command(command_name, cooldown):
+            command_cooldown_manager.update_command_cooldown(command_name)
             for _ in range(count):
                 await msg.send(response) if count > 1 else await msg.reply(response)
