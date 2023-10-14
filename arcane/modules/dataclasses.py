@@ -194,23 +194,19 @@ class Command:
 
         ann = self.func.__annotations__
 
-        for x in range(0, len(args_name)):
+        for x in range(len(args_name)):
             try:
                 v = args[x]
                 k = args_name[x]
 
-                if not type(v) == ann[k]:
-                    try:
-                        v = ann[k](v)
-
-                    except Exception:
-                        raise TypeError(f'Invalid type: got {ann[k].__name__}, {type(v).__name__} expected')
+                if not isinstance(v, ann[k]):
+                    v = ann[k](v)
 
                 args[x] = v
             except IndexError:
                 break
 
-        if len(list(self.subcommands.keys())) > 0:
+        if self.subcommands:
             try:
                 subcomm = args.pop(0).split(' ')[0]
             except Exception:
@@ -218,7 +214,7 @@ class Command:
                     command_cooldown_manager.update_command_cooldown(self.func)
                     await self.func(message, *args)
                 return
-            if subcomm in self.subcommands.keys():
+            if subcomm in self.subcommands:
                 c = message.content.split(' ')
                 new_content = ' '.join(c[1:])
                 await self.subcommands[subcomm].run(Message(
@@ -233,7 +229,6 @@ class Command:
                 if command_cooldown_manager.can_use_command(self.func, self.cooldown):
                     command_cooldown_manager.update_command_cooldown(self.func)
                     await self.func(message, *args)
-
         else:
             try:
                 if command_cooldown_manager.can_use_command(self.func, self.cooldown):
