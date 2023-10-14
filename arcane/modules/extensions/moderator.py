@@ -35,18 +35,20 @@ async def cmd_spam(msg: Message, count: int = None, response: str = None) -> Non
 
 @bot.command(name='commands', aliases=['cmds'])
 async def cmd_commands(msg: Message, subcommand: str = None) -> None:
-    bot_commands = ', '.join(bot.commands.keys())
+    bot_commands = bot.commands.keys()
 
     channel = Channel.get(Channel.name == msg.channel)
-    custom_commands_list = Command.select().where(Command.channel == channel)
-    custom_commands = ', '.join([custom_command.name for custom_command in custom_commands_list])
+    custom_commands = Command.select().where(Command.channel == channel)
 
-    if bot_commands and custom_commands:
-        await msg.reply(f'Commands: {bot_commands}, {custom_commands}')
-    elif bot_commands:
-        await msg.reply(f'Commands: {bot_commands}')
-    elif custom_commands:
-        await msg.reply(f'Commands: {custom_commands}')
+    if custom_commands:
+        all_commands = bot_commands + [custom_command.name for custom_command in custom_commands]
+    else:
+        all_commands = bot_commands
+
+    commands_str = ', '.join(sorted(all_commands))
+
+    if commands_str:
+        await msg.reply(f'Commands: {commands_str}')
     else:
         await msg.reply(f'No commands.')
 
