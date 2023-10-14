@@ -177,9 +177,6 @@ class Arcane:
             elif action == 'PRIVMSG':
                 message_object = Message.parse(self, message)
 
-                if DEBUG and message_object:
-                    printt.printt(message_object)
-
                 if message_object and self.username != message_object.author:
                     channel_name = (f'[purple3][@[link=https://twitch.tv/{message_object.channel}]'
                                     f'{message_object.channel}][/link][/purple3]')
@@ -279,6 +276,10 @@ class Arcane:
 
             if not message:
                 continue
+
+            if DEBUG:
+                printt.printt(message)
+
             await self.action_handler(message)
 
     async def event_message(self, message: Message) -> None:
