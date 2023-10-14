@@ -20,7 +20,7 @@ async def cmd_me(msg: Message, response: str = None) -> None:
     await msg.me(response)
 
 
-@bot.command(name='spam', aliases=['sm', 'спам'], permissions=['moderator', 'broadcaster'])
+@bot.command(name='spam', aliases=['sm', 'спам'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_spam(msg: Message, count: int = None, response: str = None) -> None:
     if not count or not response:
         await bot.say(msg.channel, 'Usage: !spam <count> <response>')
@@ -53,7 +53,7 @@ async def cmd_commands(msg: Message, subcommand: str = None) -> None:
         await msg.reply(f'No commands.')
 
 
-@cmd_commands.subcommand(name='add', aliases=['a'], permissions=['moderator', 'broadcaster'])
+@cmd_commands.subcommand(name='add', aliases=['a'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_add_command(msg: Message, command_name: str = None, response: str = None) -> None:
     if starts_with_emoji(command_name):
         await msg.reply('❌ Command must not contain an emoji!')
@@ -71,7 +71,7 @@ async def cmd_add_command(msg: Message, command_name: str = None, response: str 
         await msg.reply(f'❌ !{command_name} already exists.')
 
 
-@cmd_commands.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'])
+@cmd_commands.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_remove_command(msg: Message, command_name: str = None) -> None:
     channel = Channel.get(Channel.name == msg.channel)
     command = Command.get_or_none(Command.name == command_name, Command.channel == channel)
@@ -84,7 +84,7 @@ async def cmd_remove_command(msg: Message, command_name: str = None) -> None:
         await msg.reply('❌')
 
 
-@cmd_commands.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'])
+@cmd_commands.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_edit_command(msg: Message, command_name: str = None, response: str = None) -> None:
     channel = Channel.get(Channel.name == msg.channel)
     command = Command.get_or_none(Command.name == command_name, Command.channel == channel)
@@ -107,7 +107,7 @@ async def cmd_aliases(msg: Message, subcommand: str = None) -> None:
         await msg.reply(f'No aliases.')
 
 
-@cmd_aliases.subcommand(name='add', aliases=['a'], permissions=['moderator', 'broadcaster'])
+@cmd_aliases.subcommand(name='add', aliases=['a'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_add_alias(msg: Message, command_name: str = None, alias_name: str = None) -> None:
     if not command_name or not alias_name:
         await send_usage_for_custom_commands(msg)
@@ -129,7 +129,7 @@ async def cmd_add_alias(msg: Message, command_name: str = None, alias_name: str 
     await msg.reply('❌')
 
 
-@cmd_aliases.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'])
+@cmd_aliases.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_remove_alias(msg: Message, alias_name: str = None) -> None:
     if not alias_name:
         await send_usage_for_custom_commands(msg)
@@ -144,7 +144,7 @@ async def cmd_remove_alias(msg: Message, alias_name: str = None) -> None:
         await msg.reply('❌')
 
 
-@cmd_aliases.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'])
+@cmd_aliases.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_edit_alias(msg: Message, alias_name: str = None, new_name: str = None) -> None:
     if not alias_name or not new_name:
         await send_usage_for_custom_commands(msg)
@@ -160,12 +160,12 @@ async def cmd_edit_alias(msg: Message, alias_name: str = None, new_name: str = N
         await msg.reply('❌')
 
 
-@bot.command(name='settings', aliases=['set'], permissions=['moderator', 'broadcaster'])
+@bot.command(name='settings', aliases=['set'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_settings(msg: Message, subcommand: str = None) -> None:
     pass
 
 
-@cmd_settings.subcommand(name='valorant', aliases=['vlr'], permissions=['moderator', 'broadcaster'])
+@cmd_settings.subcommand(name='valorant', aliases=['vlr'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_settings_valorant(msg: Message, name_with_tag: str) -> None:
     if '#' in name_with_tag:
         channel = Channel.get(Channel.name == msg.channel)
