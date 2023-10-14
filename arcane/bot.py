@@ -6,16 +6,11 @@ from pathlib import Path
 from typing import Callable
 
 from arcane.models import Channel
-from arcane.modules import print
-from arcane.modules import printt
+from arcane.modules import printt, parser, REGEX
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
 from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.dataclasses import Message, Command, User
-from arcane.modules.parser import parser
-from arcane.modules.regex import REGEX
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
-
-console = Console()
 
 
 class Arcane:
@@ -123,7 +118,7 @@ class Arcane:
         await self._pass()
         await self._nick()
 
-        with console.status('[bold] Connecting to channels...'):
+        with printt.status('[bold] Connecting to channels...'):
             for channel in self.channels:
                 await self.join_channel(channel)
 
@@ -181,6 +176,30 @@ class Arcane:
 
             elif action == 'PRIVMSG':
                 message_object = Message.parse(self, message)
+
+                if DEBUG and message_object:
+                    printt.printt(message_object)
+
+                if message_object and self.username != message_object.author:
+                    channel_name = (f'[purple3][@[link=https://twitch.tv/{message_object.channel}]'
+                                    f'{message_object.channel}][/link][/purple3]')
+                    message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author}]'
+                                    f'{message_object.author.display_name} [/{message_object.author.color}]')
+                    printt.printt(f'[bold][blue][{message_object.datetime}][/blue] {channel_name} {message_user}[/]: '
+                                  f'[white]{message_object.content}')
+
+                    if message_object.content.startswith(self.prefix):
+                        command = message_object.content.split()[0][len(self.prefix):]
+                        if command in self.commands:
+                            await self.commands[command].execute_command(message_object)
+                        elif command in self.hidden_commands:
+                            await self.hidden_commands[command].execute_command(message_object)
+                        elif command in self.aliases:
+                            command = self.aliases[command]
+                            await self.commands[command].execute_command(message_object)
+                        else:
+                            await handle_custom_commands(message_object)
+
                 await self._cache(message_object)
                 await self.event_message(message_object)
 
@@ -263,27 +282,7 @@ class Arcane:
             await self.action_handler(message)
 
     async def event_message(self, message: Message) -> None:
-        if DEBUG and message:
-            console.print(message)
-
-        if message and self.username != message.author:
-            channel_name = f'[purple3][@[link=https://twitch.tv/{message.channel}]{message.channel}][/link][/purple3]'
-            message_user = (f'[{message.author.color}][link=https://twitch.tv/{message.author}]'
-                            f'{message.author.display_name} [/{message.author.color}]')
-            console.print(f'[bold][blue][{message.datetime}][/blue] {channel_name} {message_user}[/]: '
-                          f'[white]{message.content}')
-
-            if message.content.startswith(self.prefix):
-                command = message.content.split()[0][len(self.prefix):]
-                if command in self.commands:
-                    await self.commands[command].execute_command(message)
-                elif command in self.hidden_commands:
-                    await self.hidden_commands[command].execute_command(message)
-                elif command in self.aliases:
-                    command = self.aliases[command]
-                    await self.commands[command].execute_command(message)
-                else:
-                    await handle_custom_commands(message)
+        pass
 
     async def event_private_message(self, message: Message) -> None:
         pass
