@@ -1,10 +1,9 @@
 import asyncio
 import importlib
-import sys
 import traceback
 import uuid
 from pathlib import Path
-from typing import Callable, Match
+from typing import Callable
 
 from rich.console import Console
 
@@ -13,6 +12,7 @@ from arcane.modules import print
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
 from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.dataclasses import Message, Command, User
+from arcane.modules.parser import parser
 from arcane.modules.regex import REGEX
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 
@@ -170,32 +170,8 @@ class Arcane:
         print.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
     async def action_handler(self, message: str) -> None:
-        try:
-            regex_template = REGEX['ping'] if message.startswith('PING') else REGEX['data']
-            message_data = regex_template.match(message)
-            info = await self.get_info(message_data)
+        info, action, data, content, channel = await parser(message)
 
-            try:
-                action = message_data.group('action')
-            except Exception:
-                action = 'PING'
-
-            try:
-                data = message_data.group('data')
-            except Exception:
-                data = None
-
-            try:
-                content = message_data.group('content')
-            except Exception:
-                content = None
-
-            try:
-                channel = message_data.group('channel')
-            except Exception:
-                channel = None
-        except Exception:
-            pass
         try:
             if not action:
                 return
@@ -276,20 +252,6 @@ class Arcane:
 
         except Exception as e:
             await self.parse_error(e)
-
-    @staticmethod
-    async def get_info(message: Match) -> dict | None:
-        try:
-            info = message.group('info')
-            info_dict = {}
-            for data in info.split(';'):
-                variable = data.split('=')
-                if variable[1].isnumeric():
-                    variable[1] = int(variable[1])
-                info_dict[variable[0]] = variable[1]
-            return info_dict
-        except Exception:
-            return None
 
     async def event_message(self, message: Message) -> None:
         if DEBUG and message:
