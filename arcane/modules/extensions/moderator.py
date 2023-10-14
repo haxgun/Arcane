@@ -35,7 +35,7 @@ async def cmd_spam(msg: Message, count: int = None, response: str = None) -> Non
 
 @bot.command(name='commands', aliases=['cmds'])
 async def cmd_commands(msg: Message, subcommand: str = None) -> None:
-    bot_commands = bot.commands.keys()
+    bot_commands = list(bot.commands.keys())
 
     channel = Channel.get(Channel.name == msg.channel)
     custom_commands = Command.select().where(Command.channel == channel)
