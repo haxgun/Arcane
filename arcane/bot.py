@@ -183,8 +183,8 @@ class Arcane:
                 if message_object and self.username != message_object.author:
                     channel_name = (f'[purple3][@[link=https://twitch.tv/{message_object.channel}]'
                                     f'{message_object.channel}][/link][/purple3]')
-                    message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author}]'
-                                    f'{message_object.author.display_name} [/{message_object.author.color}]')
+                    message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author.name}]'
+                                    f'{message_object.author.display_name}[/link][/{message_object.author.color}]')
                     printt.printt(f'[bold][blue][{message_object.datetime}][/blue] {channel_name} {message_user}[/]: '
                                   f'[white]{message_object.content}')
 
