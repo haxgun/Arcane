@@ -35,6 +35,7 @@ class Arcane:
         self.prefix: str = PREFIX
         self.channels: list[str] = Channel.get_all_channel_names()
         self.commands: dict = {}
+        self.hidden_commands: dict = {}
         self.aliases: dict = {}
         self.messages: list[Message] = []
 
@@ -268,6 +269,8 @@ class Arcane:
                 command = message.content.split()[0][len(self.prefix):]
                 if command in self.commands:
                     await self.commands[command].execute_command(message)
+                elif command in self.hidden_commands:
+                    await self.hidden_commands[command].execute_command(message)
                 elif command in self.aliases:
                     command = self.aliases[command]
                     await self.commands[command].execute_command(message)

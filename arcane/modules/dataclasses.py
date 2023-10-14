@@ -134,6 +134,7 @@ class Command:
             desc: str = '',
             aliases: list[str] = [],
             permissions: list[str] = [],
+            hidden: bool = False,
     ) -> None:
         self.name = name
         self.desc = desc
@@ -141,7 +142,12 @@ class Command:
         self.permissions = permissions
         self.subcommands = {}
         self.bot = bot
-        bot.commands[name] = self
+
+        if hidden:
+            bot.hidden_commands[name] = self
+        else:
+            bot.commands[name] = self
+
         for alias in self.aliases:
             bot.aliases[alias] = name
 

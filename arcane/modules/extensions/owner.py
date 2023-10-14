@@ -5,7 +5,7 @@ from arcane.models import Channel
 from arcane.modules.api.twitch import api_latency, existing_channel_twitch
 
 
-@bot.command(name='channels', aliases=['ch'], permissions=['owner'])
+@bot.command(name='channels', aliases=['ch'], permissions=['owner'], hidden=True)
 async def cmd_channels(msg, subcommands: str = None) -> None:
     channels = Channel.get_all_channel_names()
     await msg.reply(f'Channels: {", ".join(channels)}')
@@ -46,7 +46,7 @@ async def cmd_del_channel(msg, channel_name: str) -> None:
         await msg.reply(f'The user @{channel_name} is not in the database.')
 
 
-@bot.command(name='bot', permissions=['owner'])
+@bot.command(name='bot', permissions=['owner'], hidden=True)
 async def cmd_bot_info(msg) -> None:
     api_latency_ms = await api_latency()
 
