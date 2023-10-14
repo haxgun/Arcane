@@ -249,10 +249,12 @@ class SubCommand(Command):
             desc: str = '',
             aliases: list[Command] = [],
             permissions: list[str] = [],
+            cooldown: int = 15
     ) -> None:
         self.bot = parent.bot
         self.name = name
         self.parent = parent
+        self.cooldown = cooldown
         self.subcommands = {}
         parent.subcommands[name] = self
         for alias in aliases:
