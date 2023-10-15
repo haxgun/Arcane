@@ -11,12 +11,15 @@ def add_channel() -> None:
         printt.error('There is no such user!')
         return
 
-    try:
-        existing_channel_db = Channel.get(Channel.name == channel_name)
+    existing_channel_db = Channel.get_or_none(Channel.name == channel_name)
+    if existing_channel_db:
         printt.error(f'User @{channel_name} already exists.')
-    except Exception:
-        channel = Channel.create(name=channel_name)
-        printt.success(f'User @{channel_name} added.')
+        return
+    channel = Channel.create(name=channel_name)
+    channel.oauth = str(printt.input_answer('Enter oauth:'))
+    channel.cliend_id = str(printt.input_answer('Enter cliend_id:'))
+    channel.save()
+    printt.success(f'User @{channel_name} added.')
 
 
 def remove_channel() -> None:
