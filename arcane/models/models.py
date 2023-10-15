@@ -1,6 +1,6 @@
 from typing import List
 
-from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField, IntegerField
+from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField, IntegerField, BooleanField
 
 from arcane import settings
 from arcane.settings import PREFIX
@@ -21,6 +21,7 @@ class Channel(BaseModel):
     oauth = CharField(null=True)
     cliend_id = CharField(null=True)
     prefix = CharField(default=PREFIX, max_length=1)
+    bot_has_mod = BooleanField(default=False)
     valorant = CharField(null=True)
 
     class Meta:

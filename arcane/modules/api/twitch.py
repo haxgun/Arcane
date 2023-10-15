@@ -187,6 +187,28 @@ async def set_stream_title(channel_name: str, *, title: str) -> bool:
     return False
 
 
+async def get_channel_moderations(channel_name: str) -> list | None:
+    channel_id = await get_user_id(channel_name)
+    if channel_id:
+        channel = Channel.get(Channel.name == channel_name)
+        client_id = channel.cliend_id
+        oauth = channel.oauth
+
+        headers = {
+            'Client-ID': client_id,
+            'Authorization': f'Bearer {oauth}'
+        }
+
+        url = f'https://api.twitch.tv/helix/moderation/moderators?broadcaster_id={channel_id}'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    data = data['data']
+                    return [m['user_login'] for m in data]
+    return
+
+
 async def api_latency() -> int | None:
     start_time = time.time()
 

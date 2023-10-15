@@ -7,7 +7,7 @@ from typing import Callable
 
 from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
-from arcane.modules.api.twitch import get_bot_user_id, get_bot_username
+from arcane.modules.api.twitch import get_bot_user_id, get_bot_username, get_channel_moderations
 from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.dataclasses import Message, Command, User
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
@@ -164,6 +164,17 @@ class Arcane:
         traceback_str = ''.join(traceback.format_tb(e.__traceback__))
         printt.error(f'Ignoring exception in traceback:\n{traceback_str}{e}')
 
+    async def bot_has_mod(self, channel: str):
+        channel_moderation = await get_channel_moderations(channel)
+        db_channel = Channel.get(Channel.name == channel)
+
+        if self.username in channel_moderation:
+            db_channel.bot_has_mod = True
+            db_channel.save()
+        else:
+            db_channel.bot_has_mod = False
+            db_channel.save()
+
     async def action_handler(self, message: str) -> None:
         info, action, data, content, channel = await parser(message)
 
@@ -177,25 +188,28 @@ class Arcane:
             elif action == 'PRIVMSG':
                 message_object = Message.parse(self, message)
 
-                if message_object and self.username != message_object.author:
-                    channel_name = (f'[purple3][@[link=https://twitch.tv/{message_object.channel}]'
-                                    f'{message_object.channel}][/link][/purple3]')
-                    message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author.name}]'
-                                    f'{message_object.author.display_name}[/link][/{message_object.author.color}]')
-                    printt.printt(f'[bold][blue][{message_object.datetime}][/blue] {channel_name} {message_user}[/]: '
-                                  f'[white]{message_object.content}')
+                db_channel = Channel.get(Channel.name == message_object.channel)
 
-                    if message_object.content.startswith(self.prefix):
-                        command = message_object.content.split()[0][len(self.prefix):]
-                        if command in self.commands:
-                            await self.commands[command].execute_command(message_object)
-                        elif command in self.hidden_commands:
-                            await self.hidden_commands[command].execute_command(message_object)
-                        elif command in self.aliases:
-                            command = self.aliases[command]
-                            await self.commands[command].execute_command(message_object)
-                        else:
-                            await handle_custom_commands(message_object)
+                if db_channel.bot_has_mod:
+                    if message_object and self.username != message_object.author:
+                        channel_name = (f'[purple3][@[link=https://twitch.tv/{message_object.channel}]'
+                                        f'{message_object.channel}][/link][/purple3]')
+                        message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author.name}]'
+                                        f'{message_object.author.display_name}[/link][/{message_object.author.color}]')
+                        printt.printt(f'[bold][blue][{message_object.datetime}][/blue] {channel_name} {message_user}[/]: '
+                                      f'[white]{message_object.content}')
+
+                        if message_object.content.startswith(self.prefix):
+                            command = message_object.content.split()[0][len(self.prefix):]
+                            if command in self.commands:
+                                await self.commands[command].execute_command(message_object)
+                            elif command in self.hidden_commands:
+                                await self.hidden_commands[command].execute_command(message_object)
+                            elif command in self.aliases:
+                                command = self.aliases[command]
+                                await self.commands[command].execute_command(message_object)
+                            else:
+                                await handle_custom_commands(message_object)
 
                 await self._cache(message_object)
                 await self.event_message(message_object)
@@ -207,6 +221,10 @@ class Arcane:
 
             elif action == 'JOIN':
                 sender = REGEX['author'].match(data).group('author')
+
+                if sender == self.username:
+                    await self.bot_has_mod(channel)
+
                 await self.event_user_join(User(sender, channel))
 
             elif action == 'PART':
