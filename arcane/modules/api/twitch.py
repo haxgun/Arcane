@@ -80,6 +80,13 @@ async def get_user_creation(channel_name: str) -> datetime | None:
     return
 
 
+async def get_stream_game(channel_name: str) -> str | None:
+    data = await get_stream(channel_name)
+    if data and len(data) > 0:
+        return data[0]['game_name']
+    return
+
+
 async def get_stream_title(channel_name: str) -> str | None:
     data = await get_stream(channel_name)
     if data and len(data) > 0:
