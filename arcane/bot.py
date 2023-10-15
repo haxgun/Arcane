@@ -237,7 +237,6 @@ class Arcane:
                 user = content_data.group('user')
                 user_object = User(user, channel)
 
-                print(user_object.name)
                 if mode == '+':
                     await self.event_user_op(user_object)
                 else:
