@@ -16,8 +16,8 @@ def add_channel() -> None:
         printt.error(f'User @{channel_name} already exists.')
         return
     channel = Channel.create(name=channel_name)
-    channel.oauth = str(printt.input_answer('Enter oauth:'))
-    channel.cliend_id = str(printt.input_answer('Enter cliend_id:'))
+    channel.oauth = str(printt.input_answer('Enter oauth'))
+    channel.cliend_id = str(printt.input_answer('Enter cliend_id'))
     channel.save()
     printt.success(f'User @{channel_name} added.')
 
