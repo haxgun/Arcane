@@ -98,8 +98,7 @@ class Arcane:
         if len(self.messages) > 100:
             self.messages.pop(0)
 
-    @staticmethod
-    async def _load_extensions() -> None:
+    async def _load_extensions(self) -> None:
         extension_paths = [p.stem for p in Path('./arcane/extensions/').glob('*.py')]
         with printt.status('[bold] Loading extensions...'):
             for extension in extension_paths:
@@ -108,8 +107,8 @@ class Arcane:
                     printt.success(f'\'{extension}\' loaded.')
                 except Exception as e:
                     printt.error(f'\'{extension}\' failed to load.')
-                    printt.error(f'Error: {e}')
-        printt.printt()
+                    await self.parse_error(e)
+            printt.printt()
 
     async def setup(self) -> None:
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
@@ -196,7 +195,7 @@ class Arcane:
                                         f'{message_object.channel.name}][/link][/purple3]')
                         message_user = (f'[{message_object.author.color}][link=https://twitch.tv/{message_object.author.name}]'
                                         f'{message_object.author.display_name}[/link][/{message_object.author.color}]')
-                        printt.printt(f'[bold][blue][{message_object.datetime}][/blue] {channel_name} {message_user}[/]: '
+                        printt.printt(f'[bold][blue][{message_object.timestamp}][/blue] {channel_name} {message_user}[/]: '
                                       f'[white]{message_object.content}')
 
                         if message_object.content.startswith(self.prefix):
@@ -221,21 +220,23 @@ class Arcane:
 
             elif action == 'JOIN':
                 sender = REGEX['author'].match(data).group('author')
+                user = User(name=sender, channel=channel)
 
                 if sender == self.username:
                     await self.bot_has_mod(channel)
 
-                await self.event_user_join(User(sender, channel))
+                await self.event_user_join(user)
 
             elif action == 'PART':
                 sender = REGEX['author'].match(data).group('author')
-                await self.event_user_leave(User(sender, channel))
+                user = User(name=sender, channel=channel)
+                await self.event_user_leave(user)
 
             elif action == 'MODE':
                 content_data = REGEX['mode'].match(content)
                 mode = content_data.group('mode')
                 user = content_data.group('user')
-                user_object = User(user, channel)
+                user_object = User(name=user, channel=channel)
 
                 if mode == '+':
                     await self.event_user_op(user_object)
@@ -247,7 +248,8 @@ class Arcane:
                     self.is_mod = True
                 else:
                     self.is_mod = False
-                await self.event_userstate(User(self.username, channel, tags))
+                user = User(name=self.username, channel=channel, tags=tags)
+                await self.event_userstate(user)
 
             elif action == 'ROOMSTATE':
                 await self.event_roomstate(channel, tags)
@@ -259,10 +261,11 @@ class Arcane:
                 if not content:
                     await self.event_clear(channel)
                 else:
+                    user = User(name=content, channel=channel)
                     if 'ban-duration' in tags.keys():
-                        await self.event_timeout(User(content, channel), tags)
+                        await self.event_timeout(user, tags)
                     else:
-                        await self.event_ban(User(content, channel), tags)
+                        await self.event_ban(user, tags)
 
             elif action == 'HOSTTARGET':
                 m = REGEX['host'].match(content)
