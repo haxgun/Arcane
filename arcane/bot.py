@@ -100,11 +100,11 @@ class Arcane:
 
     @staticmethod
     async def _load_extensions() -> None:
-        extension_paths = [p.stem for p in Path('./arcane/modules/extensions/').glob('*.py')]
+        extension_paths = [p.stem for p in Path('./arcane/extensions/').glob('*.py')]
         with printt.status('[bold] Loading extensions...'):
             for extension in extension_paths:
                 try:
-                    importlib.import_module(f'arcane.modules.extensions.{extension}')
+                    importlib.import_module(f'arcane.extensions.{extension}')
                     printt.success(f'\'{extension}\' loaded.')
                 except Exception as e:
                     printt.error(f'\'{extension}\' failed to load.')
