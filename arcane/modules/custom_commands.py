@@ -10,7 +10,7 @@ def starts_with_emoji(text) -> bool:
     return emoji.demojize(text) != text
 
 
-async def find_entity(msg: Message, EntityModel) -> bool:
+async def find_entity(msg: Message, entity) -> bool:
     entity_name = msg.content.split()[0][1:]
 
     if starts_with_emoji(entity_name):

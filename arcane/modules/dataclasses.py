@@ -49,6 +49,9 @@ class Channel:
 
 
 class User:
+    __slots__ = ('name', 'channel', 'id', 'display_name', 'color', 'color_rbg', 'badges', 'is_owner', 'is_broadcaster',
+                 'is_moderator', 'is_subscriber', 'is_turbo', 'is_vip', 'info')
+
     def __init__(
             self,
             name: str,
@@ -74,6 +77,8 @@ class User:
 
 
 class Message:
+    __slots__ = ('author', 'channel', 'content', 'bot', 'id', 'datetime', 'info')
+
     def __init__(
             self,
             author: User,
@@ -149,6 +154,8 @@ class Message:
 
 
 class Command:
+    __slots__ = ('name', 'desc', 'aliases', 'permissions', 'subcommands', 'cooldown', 'bot', 'func')
+
     def __init__(
             self,
             bot: 'Arcane',
@@ -264,6 +271,8 @@ class Command:
 
 
 class SubCommand(Command):
+    __slots__ = ('parent', 'name', 'desc', 'aliases', 'permissions', 'subcommands', 'cooldown', 'bot', 'func')
+
     def __init__(
             self,
             parent: Command,

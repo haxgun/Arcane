@@ -23,7 +23,7 @@ async def cmd_me(msg: Message, response: str = None) -> None:
 @bot.command(name='spam', aliases=['sm', 'спам'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_spam(msg: Message, count: int = None, response: str = None) -> None:
     if not count or not response:
-        await bot.say(msg.channel, 'Usage: !spam <count> <response>')
+        await msg.reply('Usage: !spam <count> <response>')
         return
     max_count = 20
     if count < max_count:
