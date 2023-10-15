@@ -16,12 +16,10 @@ async def find_entity(msg: Message, entity) -> bool:
     if starts_with_emoji(entity_name):
         return False
 
-    try:
-        channel = Channel.get(Channel.name == msg.channel.name)
-        entity_obg = entity.get(entity.name == entity_name, entity.channel == channel)
-        return True
-    except DoesNotExist:
-        return False
+    channel = Channel.get(Channel.name == msg.channel.name)
+    entity_obj = entity.get_or_none(entity.name == entity_name, entity.channel == channel)
+
+    return True if entity_obj else False
 
 
 async def get_command_data(msg: Message, EntityModel) -> tuple:
