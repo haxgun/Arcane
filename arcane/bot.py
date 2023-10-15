@@ -176,7 +176,7 @@ class Arcane:
             db_channel.save()
 
     async def action_handler(self, message: str) -> None:
-        info, action, data, content, channel = await parser(message)
+        tags, action, data, content, channel = await parser(message)
 
         try:
             if not action:
@@ -237,32 +237,33 @@ class Arcane:
                 user = content_data.group('user')
                 user_object = User(user, channel)
 
+                print(user_object.name)
                 if mode == '+':
                     await self.event_user_op(user_object)
                 else:
                     await self.event_user_deop(user_object)
 
             elif action == 'USERSTATE':
-                if info['mod'] == 1:
+                if tags['mod'] == 1:
                     self.is_mod = True
                 else:
                     self.is_mod = False
-                await self.event_userstate(User(self.username, channel, info))
+                await self.event_userstate(User(self.username, channel, tags))
 
             elif action == 'ROOMSTATE':
-                await self.event_roomstate(channel, info)
+                await self.event_roomstate(channel, tags)
 
             elif action == 'NOTICE':
-                await self.event_notice(channel, info)
+                await self.event_notice(channel, tags)
 
             elif action == 'CLEARCHAT':
                 if not content:
                     await self.event_clear(channel)
                 else:
-                    if 'ban-duration' in info.keys():
-                        await self.event_timeout(User(content, channel), info)
+                    if 'ban-duration' in tags.keys():
+                        await self.event_timeout(User(content, channel), tags)
                     else:
-                        await self.event_ban(User(content, channel), info)
+                        await self.event_ban(User(content, channel), tags)
 
             elif action == 'HOSTTARGET':
                 m = REGEX['host'].match(content)
@@ -275,8 +276,8 @@ class Arcane:
 
             elif action == 'USERNOTICE':
                 message = content or ''
-                user = info['login']
-                await self.event_subscribe(Message(message, user, channel, info), info)
+                user = tags['login']
+                await self.event_subscribe(Message(message, user, channel, tags), tags)
 
             elif action == 'CAP':
                 return
@@ -321,19 +322,19 @@ class Arcane:
     async def event_userstate(self,  user: User) -> None:
         pass
 
-    async def event_roomstate(self, channel, info) -> None:
+    async def event_roomstate(self, channel, tags) -> None:
         pass
 
-    async def event_notice(self, channel, info) -> None:
+    async def event_notice(self, channel, tags) -> None:
         pass
 
     async def event_clear(self, channel) -> None:
         pass
 
-    async def event_timeout(self, user: User, info) -> None:
+    async def event_timeout(self, user: User, tags) -> None:
         pass
 
-    async def event_ban(self, user: User, info) -> None:
+    async def event_ban(self, user: User, tags) -> None:
         pass
 
     async def event_host_start(self, channel, hosted_channel, viewer_count) -> None:

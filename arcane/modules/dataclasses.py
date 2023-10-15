@@ -50,34 +50,34 @@ class Channel:
 
 class User:
     __slots__ = ('name', 'channel', 'id', 'display_name', 'color', 'color_rbg', 'badges', 'is_owner', 'is_broadcaster',
-                 'is_moderator', 'is_subscriber', 'is_turbo', 'is_vip', 'info')
+                 'is_moderator', 'is_subscriber', 'is_turbo', 'is_vip', 'tags')
 
     def __init__(
             self,
             name: str,
             channel: str,
-            info: dict[str, str] = None,
+            tags: dict[str, str] = None,
     ) -> None:
         self.name = name
         self.channel = channel
 
-        if info:
-            self.id = info['user-id'] if 'user-id' in info else None
-            self.display_name = info['display-name']
-            self.color = info['color']
-            self.color_rbg = parse_color(info['color']) if info['color'] else _gen_color(self.display_name)
-            self.badges = tuple(info['badges'].split(','))
-            self.is_owner = (info['user-id'] == settings.OWNER_ID) if 'user-id' in info else None
+        if tags:
+            self.id = tags['user-id'] if 'user-id' in tags else None
+            self.display_name = tags['display-name']
+            self.color = tags['color']
+            self.color_rbg = parse_color(tags['color']) if tags['color'] else _gen_color(self.display_name)
+            self.badges = tuple(tags['badges'].split(','))
+            self.is_owner = (tags['user-id'] == settings.OWNER_ID) if 'user-id' in tags else None
             self.is_broadcaster = any(badge.startswith('broadcaster/') for badge in self.badges)
             self.is_moderator = any(badge.startswith('moderator/') for badge in self.badges)
             self.is_subscriber = any(badge.startswith(('founder/', 'subscriber/')) for badge in self.badges)
             self.is_turbo = any(badge.startswith('turbo/') for badge in self.badges)
             self.is_vip = any(badge.startswith('vip/') for badge in self.badges)
-            self.info = info
+            self.tags = tags
 
 
 class Message:
-    __slots__ = ('author', 'channel', 'content', 'bot', 'id', 'datetime', 'info')
+    __slots__ = ('author', 'channel', 'content', 'bot', 'id', 'datetime', 'tags')
 
     def __init__(
             self,
@@ -86,23 +86,23 @@ class Message:
             content: str,
             bot: 'Arcane' = None,
             datetime: str = None,
-            info: dict[str, str] = None,
+            tags: dict[str, str] = None,
     ) -> None:
         self.author = author
         self.channel = channel
         self.content = content
         self.bot = bot
 
-        if info:
-            self.id = info['id']
+        if tags:
+            self.id = tags['id']
             self.datetime = datetime
-            self.info = info
+            self.tags = tags
 
     @property
     def bg_color(self) -> tuple[int, int, int] | None:
-        if self.info.get('msg-id') == 'highlighted-message':
+        if self.tags.get('msg-id') == 'highlighted-message':
             return (117, 94, 188)
-        elif 'custom-reward-id' in self.info:
+        elif 'custom-reward-id' in self.tags:
             return 29, 91, 130
         else:
             return None
@@ -120,12 +120,12 @@ class Message:
         match = REGEX['message'].match(msg)
         if match:
 
-            info = {}
-            for part in match['info'].split(';'):
+            tags = {}
+            for part in match['tags'].split(';'):
                 k, v = part.split('=', 1)
-                info[k] = v
+                tags[k] = v
 
-            timestamp_ms = int(info['tmi-sent-ts'])
+            timestamp_ms = int(tags['tmi-sent-ts'])
             time_struct = time.gmtime(timestamp_ms / 1000)
             datetime = time.strftime('%H:%M:%S %d.%m.%Y', time_struct)
 
@@ -135,11 +135,11 @@ class Message:
                 author=User(
                     name=match['author'],
                     channel=match['channel'],
-                    info=info,
+                    tags=tags,
                 ),
                 channel=Channel(match['channel']),
                 content=match['message'],
-                info=info,
+                tags=tags,
             )
         return None
 
@@ -252,7 +252,7 @@ class Command:
                     author=message.author,
                     channel=message.channel,
                     content=new_content,
-                    info=message.info,
+                    tags=message.tags,
                 ))
             else:
                 if command_cooldown_manager.can_use_command(message_channel, self.func, self.cooldown):

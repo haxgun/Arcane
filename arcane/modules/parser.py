@@ -3,16 +3,16 @@ from typing import Match
 from arcane.modules.regex import REGEX
 
 
-async def get_info(message: Match) -> dict | None:
+async def get_tags(message: Match) -> dict | None:
     try:
-        info = message.group('info')
-        info_dict = {}
-        for data in info.split(';'):
+        tags = message.group('tags')
+        tags_dict = {}
+        for data in tags.split(';'):
             variable = data.split('=')
             if variable[1].isnumeric():
                 variable[1] = int(variable[1])
-            info_dict[variable[0]] = variable[1]
-        return info_dict
+            tags_dict[variable[0]] = variable[1]
+        return tags_dict
     except Exception:
         return None
 
@@ -21,7 +21,7 @@ async def parser(message: str) -> tuple:
     try:
         regex_template = REGEX['ping'] if message.startswith('PING') else REGEX['data']
         message_data = regex_template.match(message)
-        info = await get_info(message_data)
+        tags = await get_tags(message_data)
 
         try:
             action = message_data.group('action')
@@ -43,6 +43,6 @@ async def parser(message: str) -> tuple:
         except Exception:
             channel = None
 
-        return info, action, data, content, channel
+        return tags, action, data, content, channel
     except Exception:
         pass

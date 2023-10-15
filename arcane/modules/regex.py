@@ -2,11 +2,11 @@ import re
 
 REGEX = {
     'data': re.compile(
-        r'^(?:@(?P<info>\S+)\s)?:(?P<data>\S+)(?:\s)'
+        r'^(?:@(?P<tags>\S+)\s)?:(?P<data>\S+)(?:\s)'
         r'(?P<action>[A-Z]+)(?:\s#)(?P<channel>\S+)'
         r'(?:\s(?::)?(?P<content>.+))?'),
     'message': re.compile(
-        r'^@(?P<info>[^ ]+) :(?P<author>[^!]+).* '
+        r'^@(?P<tags>[^ ]+) :(?P<author>[^!]+).* '
         r'PRIVMSG #(?P<channel>[^ ]+) '
         r':(?P<message>[^\r]+)'),
     'ping': re.compile('PING (?P<content>.+)'),
