@@ -14,10 +14,6 @@ if dotenv_file.is_file():
 ACCESS_TOKEN = environ['ACCESS_TOKEN']
 CLIENT_ID = environ['CLIENT_ID']
 
-# Broadcaster Settings
-BROADCASTER_TOKEN = environ['BROADCASTER_TOKEN']
-BROADCASTER_CLIENT_ID = environ['BROADCASTER_CLIENT_ID']
-
 # Bot settings
 DEBUG = ast.literal_eval(environ['DEBUG'])
 PREFIX = environ['PREFIX']

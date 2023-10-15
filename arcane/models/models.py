@@ -18,6 +18,8 @@ class BaseModel(Model):
 
 
 class Channel(BaseModel):
+    oauth = CharField(null=True)
+    cliend_id = CharField(null=True)
     prefix = CharField(default=PREFIX, max_length=1)
     valorant = CharField(null=True)
 
