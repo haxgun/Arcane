@@ -23,11 +23,12 @@ To set up the Arcane, follow these steps:
 > `pipenv run removechannel `
 
 ## 🗃️ Structure
-* `/arcane`: main folder of the bot
+* `/arcane`: main folder of the bot 
+    * `/dataclasses`: dataclasses foler
+    * `/extensions`: extensions folder
     * `/models`: models for Database
     * `/modules`: modules for bot
-        * `/api`: API folder 
-        * `/extensions`: extensions folder
+        * `/api`: API folder
     * `/settings`: configuration settings of the bot
     * `bot.py`: bot core
 * `main.py`: main file for launch bot
