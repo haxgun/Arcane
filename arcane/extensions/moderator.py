@@ -3,7 +3,7 @@ from peewee import DoesNotExist
 from arcane import bot
 from arcane.models import Channel, Command, Alias
 from arcane.modules.custom_commands import starts_with_emoji
-from arcane.modules.dataclasses import Message
+from arcane.dataclasses import Message
 
 
 async def send_usage_for_custom_commands(msg: Message) -> None:

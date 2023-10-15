@@ -1,7 +1,7 @@
 from arcane import bot
 from arcane.models import Channel
 from arcane.modules.api.valorant import get_rank_with_rr_and_elo, get_stats_last_game, get_win_lose
-from arcane.modules.dataclasses import Message
+from arcane.dataclasses import Message
 
 
 @bot.command(name='tracker', aliases=['profile'])

@@ -9,7 +9,7 @@ from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
 from arcane.modules.api.twitch import get_bot_user_id, get_bot_username, get_channel_moderations
 from arcane.modules.custom_commands import handle_custom_commands
-from arcane.modules.dataclasses import Message, Command, User
+from arcane.dataclasses import Message, Command, User
 from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
 
 

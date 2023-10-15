@@ -1,9 +1,8 @@
 import emoji
-from peewee import DoesNotExist
 
 from arcane.models import Channel, Command, Alias
 from arcane.modules.cooldowns import command_cooldown_manager
-from arcane.modules.dataclasses import Message
+from arcane.dataclasses import Message
 
 
 def starts_with_emoji(text) -> bool:
