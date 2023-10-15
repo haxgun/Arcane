@@ -5,14 +5,14 @@ from arcane.modules.dataclasses import Message
 
 @bot.command(name='title', permissions=['moderador', 'broadcaster'], cooldown=0)
 async def cmd_title(msg: Message, new_title: str = None) -> None:
-    old_title = await get_stream_title(channel_name=msg.channel)
+    old_title = await get_stream_title(channel_name=msg.channel.name)
 
     if old_title:
         if new_title and len(new_title) > 3:
             if new_title == old_title:
                 await msg.reply('❌ This title is already in use!')
                 return
-            new_title_result = await set_stream_title(channel_name=msg.channel, title=title)
+            new_title_result = await set_stream_title(channel_name=msg.channel.name, title=new_title)
             if new_title_result:
                 await msg.reply('✅')
             else:
@@ -24,7 +24,7 @@ async def cmd_title(msg: Message, new_title: str = None) -> None:
 
 @bot.command(name='game', permissions=['moderador', 'broadcaster'], cooldown=0)
 async def cmd_game(msg: Message, new_game: str = None) -> None:
-    old_game = await get_stream_game(msg.channel)
+    old_game = await get_stream_game(msg.channel.name)
     if old_game:
         if new_game:
             game_data = await get_game(new_game)
@@ -32,7 +32,7 @@ async def cmd_game(msg: Message, new_game: str = None) -> None:
 
             if old_game == game_name:
                 if game_id:
-                    if await change_stream_game(msg.channel, game_id):
+                    if await change_stream_game(msg.channel.name, game_id):
                         await msg.reply(f'✅ {game_name}')
                     else:
                         await msg.reply('❌')

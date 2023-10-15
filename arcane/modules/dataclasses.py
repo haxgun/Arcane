@@ -27,6 +27,27 @@ def _gen_color(name: str) -> tuple[int, int, int]:
     return r, g, b
 
 
+class Channel:
+    __slots__ = ('_name',)
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    def __eq__(self, other):
+        return other.name == self._name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __repr__(self):
+        return f'<Channel name: {self.name}>'
+
+    @property
+    def name(self) -> str:
+        """The channel name."""
+        return self._name
+
+
 class User:
     def __init__(
             self,
@@ -56,7 +77,7 @@ class Message:
     def __init__(
             self,
             author: User,
-            channel: str,
+            channel: "Channel",
             content: str,
             bot: 'Arcane' = None,
             datetime: str = None,
@@ -111,20 +132,20 @@ class Message:
                     channel=match['channel'],
                     info=info,
                 ),
-                channel=match['channel'],
+                channel=Channel(match['channel']),
                 content=match['message'],
                 info=info,
             )
         return None
 
     async def send(self, message: str) -> None:
-        await self.bot.say(self.channel, message)
+        await self.bot.say(self.channel.name, message)
 
     async def reply(self, message: str) -> None:
-        await self.bot.reply(self.id, self.channel, message)
+        await self.bot.reply(self.id, self.channel.name, message)
 
     async def me(self, message: str) -> None:
-        await self.bot.me(self.channel, message)
+        await self.bot.me(self.channel.name, message)
 
 
 class Command:
@@ -183,7 +204,7 @@ class Command:
                 await self.run(message)
 
     async def run(self, message: 'Message') -> None:
-        message_channel = message.channel
+        message_channel = message.channel.name
         args = message.content[len(self.bot.prefix):].split(' ')[1:]
 
         args_name = inspect.getfullargspec(self.func)[0][1:]

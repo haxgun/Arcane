@@ -74,7 +74,7 @@ async def cmd_accountage(msg) -> None:
 
 @bot.command(name='uptime')
 async def cmd_uptime(msg) -> None:
-    channel_name = msg.channel
+    channel_name = msg.channel.name
     stream_started_at = await get_stream_started_at(channel_name)
 
     if stream_started_at:
@@ -100,7 +100,7 @@ async def cmd_uptime(msg) -> None:
 @bot.command(name='followsince')
 async def cmd_followsince(msg) -> None:
     target_user = msg.author
-    channel_name = msg.channel
+    channel_name = msg.channel.name
 
     follower_data = await get_followers(channel_name)
     follower = next((follower for follower in follower_data if follower['user_login'] == target_user), None)
@@ -128,7 +128,7 @@ async def cmd_followsince(msg) -> None:
 @bot.command(name='followage')
 async def cmd_followage(msg) -> None:
     target_user = msg.author
-    channel_name = msg.channel
+    channel_name = msg.channel.name
 
     follower_data = await get_followers(channel_name)
     follower = next((follower for follower in follower_data if follower['user_login'] == target_user), None)

@@ -17,8 +17,8 @@ async def find_entity(msg: Message, EntityModel) -> bool:
         return False
 
     try:
-        channel = Channel.get(Channel.name == msg.channel)
-        entity = EntityModel.get(EntityModel.name == entity_name, EntityModel.channel == channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
+        entity_obg = entity.get(entity.name == entity_name, entity.channel == channel)
         return True
     except DoesNotExist:
         return False
@@ -26,7 +26,7 @@ async def find_entity(msg: Message, EntityModel) -> bool:
 
 async def get_command_data(msg: Message, EntityModel) -> tuple:
     command_name = msg.content.split()[0][1:]
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     entity = EntityModel.get(EntityModel.name == command_name, EntityModel.channel == channel)
     cooldown = entity.cooldown
     response = entity.response
@@ -36,7 +36,7 @@ async def get_command_data(msg: Message, EntityModel) -> tuple:
 async def handle_custom_commands(msg: Message) -> None:
     count = 1
     command_name, response, cooldown = None, None, None
-    channel = msg.channel
+    channel = msg.channel.name
 
     if msg.author.is_broadcaster or msg.author.is_moderator:
         if len(msg.content.split()) > 1:

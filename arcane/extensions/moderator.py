@@ -37,7 +37,7 @@ async def cmd_spam(msg: Message, count: int = None, response: str = None) -> Non
 async def cmd_commands(msg: Message, subcommand: str = None) -> None:
     bot_commands = list(bot.commands.keys())
 
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     custom_commands = Command.select().where(Command.channel == channel)
 
     if custom_commands:
@@ -58,7 +58,7 @@ async def cmd_add_command(msg: Message, command_name: str = None, response: str 
     if starts_with_emoji(command_name):
         await msg.reply('❌ Command must not contain an emoji!')
         return
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     command = Command.get_or_none(Command.name == command_name, Command.channel == channel)
     if not command:
         command = Command.create(
@@ -73,7 +73,7 @@ async def cmd_add_command(msg: Message, command_name: str = None, response: str 
 
 @cmd_commands.subcommand(name='remove', aliases=['rm'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_remove_command(msg: Message, command_name: str = None) -> None:
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     command = Command.get_or_none(Command.name == command_name, Command.channel == channel)
 
     if command:
@@ -86,7 +86,7 @@ async def cmd_remove_command(msg: Message, command_name: str = None) -> None:
 
 @cmd_commands.subcommand(name='edit', aliases=['e'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_edit_command(msg: Message, command_name: str = None, response: str = None) -> None:
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     command = Command.get_or_none(Command.name == command_name, Command.channel == channel)
     if command:
         command.response = response
@@ -98,7 +98,7 @@ async def cmd_edit_command(msg: Message, command_name: str = None, response: str
 
 @bot.command(name='aliases', aliases=['als'])
 async def cmd_aliases(msg: Message, subcommand: str = None) -> None:
-    channel = Channel.get(Channel.name == msg.channel)
+    channel = Channel.get(Channel.name == msg.channel.name)
     aliases = Alias.select().join(Command).where(Command.channel == channel)
     if aliases:
         aliases_str = ', '.join([alias.name for alias in aliases])
@@ -116,7 +116,7 @@ async def cmd_add_alias(msg: Message, command_name: str = None, alias_name: str 
     if starts_with_emoji(command_name):
         await msg.reply(f'Command must not contain an emoji!')
         return
-    channel = Channel.get(name=msg.channel)
+    channel = Channel.get(name=msg.channel.name)
     command = Command.get_or_none(name=command_name, channel=channel)
     if command:
         alias = Alias.get_or_none(name=alias_name, channel=channel)
@@ -135,7 +135,7 @@ async def cmd_remove_alias(msg: Message, alias_name: str = None) -> None:
         await send_usage_for_custom_commands(msg)
         return
 
-    channel = Channel.get(name=msg.channel)
+    channel = Channel.get(name=msg.channel.name)
     alias = Alias.get_or_none(name=alias_name, channel=channel)
     if alias:
         alias.delete_instance()
@@ -150,7 +150,7 @@ async def cmd_edit_alias(msg: Message, alias_name: str = None, new_name: str = N
         await send_usage_for_custom_commands(msg)
         return
     try:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         alias = Alias.get(Alias.name == alias_name, Alias.channel == channel)
         alias.name = new_name
         alias.save()
@@ -168,7 +168,7 @@ async def cmd_settings(msg: Message, subcommand: str = None) -> None:
 @cmd_settings.subcommand(name='valorant', aliases=['vlr'], permissions=['moderator', 'broadcaster'], cooldown=0)
 async def cmd_settings_valorant(msg: Message, name_with_tag: str) -> None:
     if '#' in name_with_tag:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         channel.valorant = name_with_tag
         channel.save()
         await msg.reply('✅')

@@ -7,7 +7,7 @@ from arcane.modules.dataclasses import Message
 @bot.command(name='tracker', aliases=['profile'])
 async def cmd_valorant_tracker(msg: Message, valorant_name: str = None) -> None:
     if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         valorant_name = channel.valorant
     if valorant_name:
         name, tag = valorant_name.split('#')
@@ -18,7 +18,7 @@ async def cmd_valorant_tracker(msg: Message, valorant_name: str = None) -> None:
 @bot.command(name='rank')
 async def cmd_valorant_rank(msg: Message, valorant_name: str = None) -> None:
     if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         valorant_name = channel.valorant
     if valorant_name:
         info = await get_rank_with_rr_and_elo(valorant_name)
@@ -31,7 +31,7 @@ async def cmd_valorant_rank(msg: Message, valorant_name: str = None) -> None:
 @bot.command(name='lastgame', aliases=['lg'])
 async def cmd_valorant_lg(msg: Message, valorant_name: str = None) -> None:
     if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         valorant_name = channel.valorant
     if valorant_name:
         info = await get_stats_last_game(valorant_name)
@@ -44,7 +44,7 @@ async def cmd_valorant_lg(msg: Message, valorant_name: str = None) -> None:
 @bot.command(name='winlose', aliases=['wl'])
 async def cmd_valorant_winlose(msg: Message, valorant_name: str = None) -> None:
     if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel)
+        channel = Channel.get(Channel.name == msg.channel.name)
         valorant_name = channel.valorant
 
     win_count, lose_count = await get_win_lose(valorant_name)
