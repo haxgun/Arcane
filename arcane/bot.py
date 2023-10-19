@@ -5,12 +5,13 @@ import uuid
 from pathlib import Path
 from typing import Callable
 
+from arcane.dataclasses import Message, Command, User
 from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
-from arcane.modules.api.twitch import get_bot_user_id, get_bot_username, get_channel_moderations
+from arcane.modules.api.twitch import get_token_info
 from arcane.modules.custom_commands import handle_custom_commands
-from arcane.dataclasses import Message, Command, User
-from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID, PREFIX
+from arcane.modules.errors import AuthenticationError
+from arcane.settings import DEBUG, ACCESS_TOKEN, PREFIX, CLIENT_ID
 
 
 class Arcane:
@@ -25,7 +26,7 @@ class Arcane:
         self.token: str = ACCESS_TOKEN
         self.username: str | None = None
         self.client_id: str = CLIENT_ID
-        self.id: int | None = None
+        self.user_id: int | None = None
         self.prefix: str = PREFIX
         self.channels: list[str] = Channel.get_all_channel_names()
         self.commands: dict = {}
@@ -45,7 +46,7 @@ class Arcane:
         message = message.replace('\n', ' ')
         await self._send_command(f'@reply-parent-msg-id={parent} PRIVMSG #{channel} :{message}')
 
-    async def say(self, channel: str, message: str) -> None:
+    async def send(self, channel: str, message: str) -> None:
         if len(message) > 500:
             raise Exception(
                 'The maximum amount of characters in one message is 500,'
@@ -62,8 +63,10 @@ class Arcane:
                 'The maximum amount of characters in one message is 500,'
                 f' you tried to send {len(message)} characters')
 
-        message = message.replace('\n', ' ')
-        await self._send_command(f'PRIVMSG #{channel} :.me {message}')
+        while message.startswith('.'):
+            message = message[1:]
+
+        await self._send_privmsg(channel, '.me ' + message)
 
     async def _pong(self):
         await self._send_command('PONG :tmi.twitch.tv')
@@ -72,20 +75,9 @@ class Arcane:
         message = message.replace('\n', ' ')
         await self._send_command(f'PRIVMSG #{channel} :{message}')
 
-    async def _nick(self) -> None:
-        self.username = await get_bot_username()
-        await self._send_command(f'NICK {self.username}')
-
-    async def _pass(self) -> None:
-        await self._send_command(f'PASS oauth:{self.token}')
-
     async def _send_command(self, command: str) -> None:
         self.writer.write((command + '\r\n').encode())
         return await self.writer.drain()
-
-    async def _capability(self, *args) -> None:
-        for arg in args:
-            await self._send_command(f'CAP REQ :twitch.tv/{arg}')
 
     async def join_channel(self, channel: str) -> None:
         await self._send_command(f'JOIN #{channel}')
@@ -110,32 +102,38 @@ class Arcane:
                     await self.parse_error(e)
             printt.printt()
 
-    async def setup(self) -> None:
+    async def _connect(self) -> None:
+        try:
+            data = await get_token_info(self.token)
+        except AuthenticationError:
+            raise AuthenticationError('Invalid or unauthorized Access Token passed.')
+
+        self.username = data['login']
+        self.user_id = data['user_id']
+
         self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
-        self.id = await get_bot_user_id()
-        await self._capability('tags', 'commands', 'membership')
-        await self._pass()
-        await self._nick()
 
-        with printt.status('[bold] Connecting to channels...'):
-            for channel in self.channels:
-                await self.join_channel(channel)
-
+        await self.authenticate()
         await self.event_ready()
         await self._load_extensions()
         await self._loop_for_messages()
 
+    async def authenticate(self) -> None:
+        await self._send_command(f'PASS oauth:{self.token}')
+        await self._send_command(f'NICK {self.username}')
+
+        for cap in ('tags', 'commands', 'membership'):
+            await self._send_command(f'CAP REQ :twitch.tv/{cap}')
+
+        for channel in self.channels:
+            await self.join_channel(channel)
+
     async def event_ready(self) -> None:
-        if self.ready:
-            return
-
-        self.ready = True
-
         if DEBUG:
             printt.printt('[red bold][!!!!!!] DEBUG MODE ENABLED [!!!!!!][/]')
 
         bot_nick = f'[link=https://twitch.tv/{self.username}][yellow]@{self.username}[/link][/yellow]'
-        printt.success(f'Connected as {bot_nick} with ID: {self.id}')
+        printt.success(f'Connected as {bot_nick} with ID: {self.user_id}')
         channel_connected = ', '.join(
             [f'[link=https://twitch.tv/{channel}][yellow]@{channel}[/link][/yellow]' for channel in
              self.channels])
@@ -144,14 +142,12 @@ class Arcane:
 
     def run(self) -> None:
         try:
-            task_setup = self.setup()
-            self.loop.run_until_complete(task_setup)
+            self.loop.run_until_complete(self._connect())
             self.loop.run_forever()
         except KeyboardInterrupt:
             pass
         finally:
-            task_stop = self.stop()
-            self.loop.run_until_complete(task_stop)
+            self.loop.run_until_complete(self.stop())
             self.loop.close()
 
     async def stop(self) -> None:

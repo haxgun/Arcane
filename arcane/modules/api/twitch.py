@@ -9,7 +9,7 @@ from fuzzywuzzy import fuzz
 
 from arcane import settings
 from arcane.models import Channel
-from arcane.modules import printt
+from arcane.modules.errors import AuthenticationError, HTTPException
 
 session = aiohttp.ClientSession()
 
@@ -19,22 +19,17 @@ bot_headers = {
 }
 
 
-async def get_bot_username() -> str:
-    url = 'https://api.twitch.tv/helix/users'
-    async with session.get(url=url, headers=bot_headers) as response:
-        try:
-            data = await response.json()
-            if 'data' in data and len(data['data']) > 0:
-                return data['data'][0]['login']
-        except Exception as e:
-            printt.error(f'Error: {e}')
+async def get_token_info(token):
+    url = 'https://id.twitch.tv/oauth2/validate'
+    headers = {'Authorization': f'OAuth {token}'}
 
-
-async def get_bot_user_id() -> int:
-    async with session.get('https://api.twitch.tv/helix/users', headers=bot_headers) as response:
-        data = await response.json()
-        if 'data' in data and len(data['data']) > 0:
-            return data['data'][0]['id']
+    async with session.get(url=url, headers=headers) as resp:
+        if resp.status == 401:
+            raise AuthenticationError('Invalid or unauthorized Access Token passed.')
+        if resp.status > 300 or resp.status < 200:
+            raise HTTPException('Unable to validate Access Token: ' + await resp.text())
+        data: dict = await resp.json()
+        return data
 
 
 def existing_channel_twitch(channel_name: str) -> bool:
