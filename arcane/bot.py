@@ -17,7 +17,6 @@ from arcane.settings import DEBUG, ACCESS_TOKEN, PREFIX, CLIENT_ID
 class Arcane:
 
     def __init__(self) -> None:
-        self.ready: bool = False
         self.host: str = 'irc.chat.twitch.tv'
         self.port: int = 6697
         self.loop: asyncio.AbstractEventLoop | None = None or asyncio.get_event_loop()
