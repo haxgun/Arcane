@@ -76,7 +76,7 @@ class Message:
         return None
 
     async def send(self, message: str) -> None:
-        await self._bot.say(self.channel.name, message)
+        await self._bot.send(self.channel.name, message)
 
     async def reply(self, message: str) -> None:
         await self._bot.reply(self.id, self.channel.name, message)
