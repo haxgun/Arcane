@@ -33,5 +33,9 @@ To set up the Arcane, follow these steps:
     * `bot.py`: bot core
 * `main.py`: main file for launch bot
 
+## 📝 TODO
+1. Learn more about the asyncio, aiohttp library
+2. Add a separate class for connecting via a web socket and to different APIs
+
 ## 📄 License
 [Arcane](https://github.com/haxgun/Arcane) is completely free and has an [the MIT license](https://github.com/haxgun/Arcane/blob/main/LICENSE). If you want, you can put a star on Github.
