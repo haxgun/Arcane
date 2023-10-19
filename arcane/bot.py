@@ -5,6 +5,8 @@ import uuid
 from pathlib import Path
 from typing import Callable
 
+import aiohttp
+
 from arcane.dataclasses import Message, Command, User
 from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
@@ -17,12 +19,10 @@ from arcane.settings import DEBUG, ACCESS_TOKEN, PREFIX, CLIENT_ID
 class Arcane:
 
     def __init__(self) -> None:
-        self.host: str = 'irc.chat.twitch.tv'
-        self.port: int = 6697
-        self.loop: asyncio.AbstractEventLoop | None = None or asyncio.get_event_loop()
-        self.reader: asyncio.StreamReader | None = None
-        self.writer: asyncio.StreamWriter | None = None
-        self.token: str = ACCESS_TOKEN
+        self._host: str = 'wss://irc-ws.chat.twitch.tv:443'
+        self._loop: asyncio.AbstractEventLoop | None = None or asyncio.get_event_loop()
+        self._websocket = None
+        self._token: str = ACCESS_TOKEN
         self.username: str | None = None
         self.client_id: str = CLIENT_ID
         self.user_id: int | None = None
@@ -75,8 +75,7 @@ class Arcane:
         await self._send_command(f'PRIVMSG #{channel} :{message}')
 
     async def _send_command(self, command: str) -> None:
-        self.writer.write((command + '\r\n').encode())
-        return await self.writer.drain()
+        await self._websocket.send_str(command + '\r\n')
 
     async def join_channel(self, channel: str) -> None:
         await self._send_command(f'JOIN #{channel}')
@@ -103,14 +102,15 @@ class Arcane:
 
     async def _connect(self) -> None:
         try:
-            data = await get_token_info(self.token)
+            data = await get_token_info(self._token)
         except AuthenticationError:
             raise AuthenticationError('Invalid or unauthorized Access Token passed.')
 
         self.username = data['login']
         self.user_id = data['user_id']
 
-        self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=True)
+        session = aiohttp.ClientSession()
+        self._websocket = await session.ws_connect(url=self._host, heartbeat=30.0)
 
         await self.authenticate()
         await self.event_ready()
@@ -118,7 +118,7 @@ class Arcane:
         await self._loop_for_messages()
 
     async def authenticate(self) -> None:
-        await self._send_command(f'PASS oauth:{self.token}')
+        await self._send_command(f'PASS oauth:{self._token}')
         await self._send_command(f'NICK {self.username}')
 
         for cap in ('tags', 'commands', 'membership'):
@@ -141,17 +141,17 @@ class Arcane:
 
     def run(self) -> None:
         try:
-            self.loop.run_until_complete(self._connect())
-            self.loop.run_forever()
+            self._loop.run_until_complete(self._connect())
+            self._loop.run_forever()
         except KeyboardInterrupt:
             pass
         finally:
-            self.loop.run_until_complete(self.stop())
-            self.loop.close()
+            self._loop.run_until_complete(self.stop())
+            self._loop.close()
 
     async def stop(self) -> None:
-        if self.writer:
-            self.writer.close()
+        if self._websocket:
+            await self._websocket.close()
 
     @staticmethod
     async def parse_error(e: Exception) -> None:
@@ -269,16 +269,17 @@ class Arcane:
 
     async def _loop_for_messages(self) -> None:
         while True:
-            received_msg = await self.reader.readline()
-            message = received_msg.decode().strip()
+            received_msg = await self._websocket.receive()
+            if received_msg.type == aiohttp.WSMsgType.TEXT:
+                message = received_msg.data.rstrip()
 
-            if not message:
-                continue
+                if not message:
+                    continue
 
-            if DEBUG:
-                printt.printt(message)
+                if DEBUG:
+                    printt.printt(message)
 
-            await self.action_handler(message)
+                await self.action_handler(message)
 
     async def event_message(self, message: Message) -> None:
         pass
