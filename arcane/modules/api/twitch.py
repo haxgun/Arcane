@@ -11,6 +11,8 @@ from arcane import settings
 from arcane.models import Channel
 from arcane.modules import printt
 
+session = aiohttp.ClientSession()
+
 bot_headers = {
     'Client-ID': settings.CLIENT_ID,
     'Authorization': f'Bearer {settings.ACCESS_TOKEN}'
@@ -19,22 +21,20 @@ bot_headers = {
 
 async def get_bot_username() -> str:
     url = 'https://api.twitch.tv/helix/users'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=bot_headers) as response:
-            try:
-                data = await response.json()
-                if 'data' in data and len(data['data']) > 0:
-                    return data['data'][0]['login']
-            except Exception as e:
-                printt.error(f'Error: {e}')
+    async with session.get(url=url, headers=bot_headers) as response:
+        try:
+            data = await response.json()
+            if 'data' in data and len(data['data']) > 0:
+                return data['data'][0]['login']
+        except Exception as e:
+            printt.error(f'Error: {e}')
 
 
 async def get_bot_user_id() -> int:
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://api.twitch.tv/helix/users', headers=bot_headers) as response:
-            data = await response.json()
-            if 'data' in data and len(data['data']) > 0:
-                return data['data'][0]['id']
+    async with session.get('https://api.twitch.tv/helix/users', headers=bot_headers) as response:
+        data = await response.json()
+        if 'data' in data and len(data['data']) > 0:
+            return data['data'][0]['id']
 
 
 def existing_channel_twitch(channel_name: str) -> bool:
@@ -47,22 +47,20 @@ def existing_channel_twitch(channel_name: str) -> bool:
 
 async def get_stream(channel_name: str) -> list | None:
     url = f'https://api.twitch.tv/helix/streams?user_login={channel_name}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=bot_headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return data['data']
-            return
+    async with session.get(url, headers=bot_headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return data['data']
+        return
 
 
 async def get_user(channel_name: str) -> dict | None:
     url = f'https://api.twitch.tv/helix/users?login={channel_name}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=bot_headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return data['data']
-            return
+    async with session.get(url, headers=bot_headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return data['data']
+        return
 
 
 async def get_user_id(channel_name: str) -> str | None:
@@ -105,23 +103,21 @@ async def get_stream_started_at(channel_name: str) -> datetime | None:
 async def get_followers(channel_name: str) -> list | None:
     channel_id = await get_user_id(channel_name)
     url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=bot_headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return data['data']
-            return
+    async with session.get(url, headers=bot_headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return data['data']
+        return
 
 
 async def get_followers_count(channel_name: str) -> list | None:
     channel_id = await get_user_id(channel_name)
     url = f'https://api.twitch.tv/helix/channels/followers?broadcaster_id={channel_id}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=bot_headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return data['total']
-            return
+    async with session.get(url, headers=bot_headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return data['total']
+        return
 
 
 def find_most_similar_game(games_data, game_to_find):
@@ -141,12 +137,11 @@ def find_most_similar_game(games_data, game_to_find):
 
 async def get_game(new_game: str) -> tuple[str, str] | None:
     url = f'https://api.twitch.tv/helix/search/categories?query={new_game}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=bot_headers) as response:
-            if response.status == 200:
-                data = await response.json()
-                return find_most_similar_game(data['data'], new_game)
-            return
+    async with session.get(url, headers=bot_headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return find_most_similar_game(data['data'], new_game)
+        return
 
 
 async def change_stream_game(channel_name: str, game_id: str) -> bool:
@@ -164,10 +159,9 @@ async def change_stream_game(channel_name: str, game_id: str) -> bool:
         }
 
         payload = {'game_id': game_id}
-        async with aiohttp.ClientSession() as session:
-            async with session.patch(url, headers=headers, json=payload) as response:
-                if response.status == 204:
-                    return True
+        async with session.patch(url, headers=headers, json=payload) as response:
+            if response.status == 204:
+                return True
     return False
 
 
@@ -187,10 +181,9 @@ async def set_stream_title(channel_name: str, *, title: str) -> bool:
 
         payload = {'title': title}
 
-        async with aiohttp.ClientSession() as session:
-            async with session.patch(url, headers=headers, json=payload) as response:
-                if response.status == 204:
-                    return True
+        async with session.patch(url, headers=headers, json=payload) as response:
+            if response.status == 204:
+                return True
     return False
 
 
@@ -207,20 +200,18 @@ async def get_channel_moderations(channel_name: str) -> list | None:
         }
 
         url = f'https://api.twitch.tv/helix/moderation/moderators?broadcaster_id={channel_id}'
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    data = data['data']
-                    return [m['user_login'] for m in data]
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                data = data['data']
+                return [m['user_login'] for m in data]
     return
 
 
 async def api_latency() -> int | None:
     start_time = time.time()
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://gql.twitch.tv/gql', timeout=5):
-            end_time = time.time()
-            latency = round((end_time - start_time) * 1000)
-            return latency
+    async with session.get('https://gql.twitch.tv/gql', timeout=5):
+        end_time = time.time()
+        latency = round((end_time - start_time) * 1000)
+        return latency
