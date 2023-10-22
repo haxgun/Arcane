@@ -45,13 +45,14 @@ class User:
             self._display_name: str | None = self._tags.get('display-name')
             self._color: str | None = self._tags.get('color')
             self._badges: str | None = self._tags.get('badges')
-            self._is_mod: bool | None = bool(self._tags['mod'])
-            self._is_sub: bool | None = bool(self._tags['subscriber'])
-            self._is_turbo: bool | None = bool(self._tags.get('turbo'))
+            self._is_mod: bool | None = self._tags.get('mod') == 1
+            self._is_sub: bool | None = self._tags.get('subscriber') == 1
+            self._is_turbo: bool | None = self._tags.get('turbo') == 1
             self._is_vip: bool | None = bool(self._tags.get('vip', 0))
 
             if self._badges:
-                self._cached_badges: dict[str, str] | None = dict([badge.split('/') for badge in self._badges.split(',')])
+                self._cached_badges: dict[str, str] | None = (
+                    dict([badge.split('/') for badge in self._badges.split(',')]))
 
     def __repr__(self):
         return f'<Chatter name: {self._name}, channel: {self._channel}>'
@@ -75,6 +76,10 @@ class User:
     @property
     def id(self) -> str | None:
         return self._id
+
+    @property
+    def user_id(self) -> str | None:
+        return self.id
 
     @property
     def mention(self) -> str:
@@ -111,6 +116,10 @@ class User:
     @property
     def is_subscriber(self) -> bool | None:
         return self._is_sub or 'founder' in self.badges
+
+    @property
+    def is_prime(self) -> bool | None:
+        return 'premium' in self.badges
 
     @property
     def is_owner(self) -> bool | None:
