@@ -42,8 +42,8 @@ class User:
 
         if self._tags:
             self._id: str | None = self._tags.get('user-id')
-            self._display_name: str | None = self._tags['display-name']
-            self._color: str | None = self._tags['color']
+            self._display_name: str | None = self._tags.get('display-name')
+            self._color: str | None = self._tags.get('color')
             self._badges: str | None = self._tags.get('badges')
             self._is_mod: bool | None = bool(self._tags['mod'])
             self._is_sub: bool | None = bool(self._tags['subscriber'])

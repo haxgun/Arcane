@@ -35,13 +35,6 @@ async def handle_custom_commands(msg: Message) -> None:
     command_name, response, cooldown = None, None, None
     channel = msg.channel.name
 
-    if msg.author.is_broadcaster or msg.author.is_moderator:
-        if len(msg.content.split()) > 1:
-            try:
-                count = int(msg.content.split()[1])
-            except ValueError:
-                pass
-
     if await find_entity(msg, Command):
         command_name, cooldown, response = await get_command_data(msg, Command)
     elif await find_entity(msg, Alias):
@@ -50,5 +43,13 @@ async def handle_custom_commands(msg: Message) -> None:
     if response and cooldown:
         if command_cooldown_manager.can_use_command(channel, command_name, cooldown):
             command_cooldown_manager.update_command_cooldown(channel, command_name)
+
+            if msg.author.is_broadcaster or msg.author.is_moderator:
+                if len(msg.content.split()) > 1:
+                    try:
+                        count = int(msg.content.split()[1])
+                    except ValueError:
+                        pass
+
             for _ in range(count):
                 await msg.send(response) if count > 1 else await msg.reply(response)
