@@ -11,7 +11,6 @@ from arcane.dataclasses import Message, Command, User
 from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
 from arcane.modules.api.twitch import get_token_info
-from arcane.modules.custom_commands import handle_custom_commands
 from arcane.modules.errors import AuthenticationError
 from arcane.settings import DEBUG, ACCESS_TOKEN, PREFIX, CLIENT_ID
 
@@ -27,7 +26,7 @@ class Arcane:
         self.client_id: str = CLIENT_ID
         self.user_id: int | None = None
         self.prefix: str = PREFIX
-        self.channels: list[str] = Channel.get_all_channel_names()
+        self.channels: list[str] = ['ArcaneApp'] + Channel.get_all_channel_names()
         self.commands: dict = {}
         self.hidden_commands: dict = {}
         self.aliases: dict = {}
@@ -188,8 +187,6 @@ class Arcane:
                         elif command in self.aliases:
                             command = self.aliases[command]
                             await self.commands[command].execute_command(message_object)
-                        else:
-                            await handle_custom_commands(message_object)
 
                 await self._cache(message_object)
                 await self.event_message(message_object)

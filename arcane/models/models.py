@@ -1,6 +1,6 @@
 from typing import List
 
-from peewee import SqliteDatabase, Model, CharField, ForeignKeyField, PrimaryKeyField, IntegerField, BooleanField
+from peewee import SqliteDatabase, Model, CharField, PrimaryKeyField
 
 from arcane import settings
 from arcane.settings import PREFIX
@@ -18,8 +18,6 @@ class BaseModel(Model):
 
 
 class Channel(BaseModel):
-    oauth = CharField(null=True)
-    cliend_id = CharField(null=True)
     prefix = CharField(default=PREFIX, max_length=1)
     valorant = CharField(null=True)
 
@@ -31,21 +29,4 @@ class Channel(BaseModel):
         return [channel.name for channel in Channel.select()]
 
 
-class Command(BaseModel):
-    response = CharField(default="Нет ответа")
-    channel = ForeignKeyField(Channel, backref='commands', on_delete='CASCADE')
-    cooldown = IntegerField(default=15)
-
-    class Meta:
-        db_table = 'commands'
-
-
-class Alias(BaseModel):
-    command = ForeignKeyField(Command, backref='aliases', on_delete='CASCADE')
-    channel = ForeignKeyField(Channel, backref='aliases', on_delete='CASCADE')
-
-    class Meta:
-        db_table = 'aliases'
-
-
-db.create_tables([Channel, Command, Alias])
+db.create_tables([Channel])
