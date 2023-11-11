@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Tuple, Dict, Any
 
 import aiohttp
 
@@ -69,25 +70,29 @@ async def get_matches(name_with_tag: str, mode: str = 'competitive', size: int =
     return await fetch_data(url)
 
 
-async def get_stats_last_game(name_with_tag: str) -> dict | str:
+async def get_stats_last_game(name_with_tag: str) -> dict[str | int, str | int]:
     data = await get_matches(name_with_tag, size=1)
     game_data = data['data'][0]
 
     stats = game_data['stats']
     teams = game_data['teams']
-    map_name = game_data['meta']['map']['name']
-    match_id = game_data['meta']['id']
-    team = game_data['stats']['team']
+    meta = game_data['meta']
+    map_name = meta['map']['name']
+    match_id = meta['id']
+    team = stats['team']
 
     character = stats['character']['name']
     kills = stats['kills']
     deaths = stats['deaths']
     assists = stats['assists']
+    kill_death_ratio = str(round(int(kills) / int(deaths), 1))
 
     shots = stats['shots']
     head_shots = shots.get('head', 0)
     body_shots = shots.get('body', 0)
     leg_shots = shots.get('leg', 0)
+
+    damage_made = stats['damage']['made']
 
     total_shots = head_shots + body_shots + leg_shots
 
@@ -95,6 +100,7 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
 
     red_score = teams['red']
     blue_score = teams['blue']
+    total_round = red_score + blue_score
 
     if red_score > blue_score:
         win = 'Red'
@@ -103,15 +109,23 @@ async def get_stats_last_game(name_with_tag: str) -> dict | str:
     else:
         win = 'Drew'
 
-    if team == win:
-        win_status = 'W'
-    elif win == 'Drew':
-        win_status = 'D'
-    else:
-        win_status = 'L'
+    win_status = 'W' if team == win else 'D' if win == 'Drew' else 'L'
+    average_damage_per_round = str(round(int(damage_made) / int(total_round), 1))
 
-    return (f'{map_name} ({win_status}: {red_score}/{blue_score}) - {character} - {kills}/{deaths}/{assists} - HS: '
-            f'{head_shot_percentage}%')
+    return {
+            'match_id': match_id,
+            'map_name': map_name,
+            'win_status': win_status,
+            'red_score': red_score,
+            'blue_score': blue_score,
+            'character': character,
+            'kills': kills,
+            'deaths': deaths,
+            'assists': assists,
+            'kdr': kill_death_ratio,
+            'hs': head_shot_percentage,
+            'adr': average_damage_per_round
+        }
 
 
 def is_last_24_hours(date_str):

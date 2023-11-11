@@ -36,7 +36,9 @@ async def cmd_valorant_lg(msg: Message, valorant_name: str = None) -> None:
     if valorant_name:
         info = await get_stats_last_game(valorant_name)
         if info:
-            await msg.reply(info)
+            await msg.reply(f'{info["map_name"]} ({info["win_status"]}: {info["red_score"]}/{info["blue_score"]}) - '
+                            f'{info["character"]} - {info["kills"]}/{info["deaths"]}/{info["assists"]} - '
+                            f'KD: {info["kdr"]} HS%: {info["hs"]} ADR: {info["adr"]}')
         else:
             await msg.reply('❌')
 
