@@ -1,6 +1,6 @@
 from typing import List
 
-from peewee import SqliteDatabase, Model, CharField, PrimaryKeyField
+from peewee import SqliteDatabase, Model, CharField, PrimaryKeyField, BooleanField
 
 from arcane import settings
 
@@ -17,7 +17,8 @@ class BaseModel(Model):
 
 
 class Channel(BaseModel):
-    valorant = CharField(null=True)
+    riot_id = CharField(null=True)
+    otherplayer = BooleanField(default=False)
 
     class Meta:
         db_table = 'channels'

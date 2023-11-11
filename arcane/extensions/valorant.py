@@ -6,8 +6,8 @@ from arcane.dataclasses import Message
 
 @bot.command(name='tracker', aliases=['profile'])
 async def cmd_valorant_tracker(msg: Message, valorant_name: str = None) -> None:
-    if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel.name)
+    channel = Channel.get(Channel.name == msg.channel.name)
+    if not valorant_name or '#' not in valorant_name or channel.riot_id:
         valorant_name = channel.valorant
     if valorant_name:
         name, tag = valorant_name.split('#')
@@ -17,34 +17,34 @@ async def cmd_valorant_tracker(msg: Message, valorant_name: str = None) -> None:
 
 @bot.command(name='rank')
 async def cmd_valorant_rank(msg: Message, valorant_name: str = None) -> None:
-    if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel.name)
+    channel = Channel.get(Channel.name == msg.channel.name)
+    if not valorant_name or '#' not in valorant_name or channel.riot_id:
         valorant_name = channel.valorant
     if valorant_name:
         info = await get_rank_with_rr_and_elo(valorant_name)
         if info:
             await msg.reply(info)
         else:
-            await msg.reply('ERROR')
+            await msg.reply('❌')
 
 
 @bot.command(name='lastgame', aliases=['lg'])
 async def cmd_valorant_lg(msg: Message, valorant_name: str = None) -> None:
-    if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel.name)
+    channel = Channel.get(Channel.name == msg.channel.name)
+    if not valorant_name or '#' not in valorant_name or channel.riot_id:
         valorant_name = channel.valorant
     if valorant_name:
         info = await get_stats_last_game(valorant_name)
         if info:
             await msg.reply(info)
         else:
-            await msg.reply('ERROR')
+            await msg.reply('❌')
 
 
 @bot.command(name='winlose', aliases=['wl'])
 async def cmd_valorant_winlose(msg: Message, valorant_name: str = None) -> None:
-    if not valorant_name or '#' not in valorant_name:
-        channel = Channel.get(Channel.name == msg.channel.name)
+    channel = Channel.get(Channel.name == msg.channel.name)
+    if not valorant_name or '#' not in valorant_name or channel.riot_id:
         valorant_name = channel.valorant
 
     win_count, lose_count = await get_win_lose(valorant_name)
@@ -52,4 +52,4 @@ async def cmd_valorant_winlose(msg: Message, valorant_name: str = None) -> None:
         win_rate = round((win_count / (win_count + lose_count)) * 100)
     else:
         win_rate = 0
-    await msg.reply(f'Ranked W: {win_count} L: {lose_count} ({win_rate}%)')
+    await msg.reply(f'W: {win_count} L: {lose_count} ({win_rate}%)')
