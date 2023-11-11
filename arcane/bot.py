@@ -12,11 +12,10 @@ from arcane.models import Channel
 from arcane.modules import printt, parser, REGEX
 from arcane.modules.api.twitch import get_token_info
 from arcane.modules.errors import AuthenticationError
-from arcane.settings import DEBUG, ACCESS_TOKEN, PREFIX, CLIENT_ID
+from arcane.settings import DEBUG, ACCESS_TOKEN, CLIENT_ID
 
 
 class Arcane:
-
     def __init__(self) -> None:
         self._host: str = 'wss://irc-ws.chat.twitch.tv:443'
         self._loop: asyncio.AbstractEventLoop | None = None or asyncio.get_event_loop()
@@ -25,8 +24,8 @@ class Arcane:
         self.username: str | None = None
         self.client_id: str = CLIENT_ID
         self.user_id: int | None = None
-        self.prefix: str = PREFIX
-        self.channels: list[str] = ['ArcaneApp'] + Channel.get_all_channel_names()
+        self.prefix: str = '!'
+        self.channels: list[str] = Channel.get_all_channel_names()
         self.commands: dict = {}
         self.hidden_commands: dict = {}
         self.aliases: dict = {}

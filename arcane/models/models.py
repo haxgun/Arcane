@@ -3,7 +3,6 @@ from typing import List
 from peewee import SqliteDatabase, Model, CharField, PrimaryKeyField
 
 from arcane import settings
-from arcane.settings import PREFIX
 
 db = SqliteDatabase(settings.DB_NAME)
 
@@ -18,7 +17,6 @@ class BaseModel(Model):
 
 
 class Channel(BaseModel):
-    prefix = CharField(default=PREFIX, max_length=1)
     valorant = CharField(null=True)
 
     class Meta:

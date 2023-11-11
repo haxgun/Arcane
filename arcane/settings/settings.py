@@ -16,7 +16,6 @@ CLIENT_ID = environ['CLIENT_ID']
 
 # Bot settings
 DEBUG = ast.literal_eval(environ['DEBUG'])
-PREFIX = environ['PREFIX']
 OWNER_ID = str(environ['OWNER_ID'])
 
 # DB settings
